@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 function App() {
@@ -85,4 +85,6 @@ const getListStyle = (isDraggingOver) => ({
   width: 250,
 });
 
-ReactDOM.render(<App />, document.getElementById("root"));
+const container = document.getElementById("root");
+const root = createRoot(container);
+root.render(<App />);
