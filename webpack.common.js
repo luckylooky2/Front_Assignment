@@ -4,7 +4,7 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx"],
   },
-  entry: { app: "./index.jsx" },
+  entry: { app: "./index.js" },
   output: {
     filename: "[name].js",
     path: path.join(__dirname, "/dist"),
