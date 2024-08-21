@@ -4,7 +4,12 @@
   "plugins": ["react", "import"],
   "parser": "@babel/eslint-parser",
   "parserOptions": {
+    "sourceType": "module",
     "requireConfigFile": false,
+    "ecmaFeatures": {
+      "jsx": true,
+    },
+    "ecmaVersion": 2015,
     "babelOptions": {
       "presets": ["@babel/preset-react"],
     },
