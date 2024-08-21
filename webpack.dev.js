@@ -19,6 +19,8 @@ module.exports = merge(common, {
   plugins: [
     new ESLintPlugin({
       emitWarning: true,
+      extensions: ['js', 'jsx'],
+      exclude: 'node_modules',
     }),
   ],
 });
