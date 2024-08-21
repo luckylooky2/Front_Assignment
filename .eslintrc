@@ -1,0 +1,36 @@
+{
+  "root": true,
+  "extends": ["eslint:recommended", "plugin:react/recommended"],
+  "plugins": ["react", "import"],
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false,
+    "babelOptions": {
+      "presets": ["@babel/preset-react"],
+    },
+  },
+  "rules": {
+    "no-undef": ["off"],
+    "no-console": ["warn"],
+    "no-unused-vars": ["warn"],
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          ["builtin", "external"],
+          "internal",
+          "parent",
+          "sibling",
+          "index",
+        ],
+        "newlines-between": "always",
+        "alphabetize": { "order": "asc" },
+      },
+    ],
+  },
+  "settings": {
+    "react": {
+      "version": "detect",
+    },
+  },
+}
