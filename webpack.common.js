@@ -18,6 +18,7 @@ module.exports = {
         loader: 'babel-loader',
         options: {
           presets: ['@babel/preset-react', '@babel/preset-env'],
+          plugins: ['@emotion/babel-plugin'],
         },
         exclude: path.join(__dirname, 'node_modules'),
       },
