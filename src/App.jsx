@@ -24,9 +24,33 @@ export default function App() {
   const [dragResults, setDragResults] = useState([]);
   const styles = getLayoutStyles;
 
+  const removeResult = (id) => {
+    setDragResults((prevAlerts) =>
+      prevAlerts.filter((alert) => alert.id !== id),
+    );
+  };
+
+  const addResult = (result) => {
+    const id = Date.now();
+    setDragResults((prev) => [...prev, { id, result, visible: true }]);
+
+    setTimeout(() => {
+      setDragResults((prevAlerts) =>
+        prevAlerts.map((alert) =>
+          alert.id === id ? { ...alert, visible: false } : alert,
+        ),
+      );
+    }, 3000);
+
+    setTimeout(() => {
+      removeResult(id);
+    }, 3500);
+  };
+
   const handleDragEnd = (result) => {
     if (!result.destination || !dstDraggableState.isValid) {
       setDstDraggableState(dstDraggableStateCreator(true));
+      addResult(false);
       return;
     }
 
@@ -37,6 +61,7 @@ export default function App() {
 
     setItemLists(newItems);
     setSrcDraggable(null);
+    addResult(true);
     setDstDraggableState(dstDraggableStateCreator(true));
   };
 
