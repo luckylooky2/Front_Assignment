@@ -4,10 +4,11 @@ import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 
 import { getDndStyles } from './styles';
-import { getNumberFromId } from './utils';
+import { getNumberFromId, sortSrcDraggableByRow } from './utils';
 
 const DraggableWrapper = ({
   item,
+  itemList,
   itemIndex,
   droppableIdx,
   srcDraggable,
@@ -20,7 +21,7 @@ const DraggableWrapper = ({
 
   const handleClick = (event) => {
     event.stopPropagation();
-    const { target, metaKey, ctrlKey } = event;
+    const { target, metaKey, ctrlKey, shiftKey } = event;
     const { rowIdx, colIdx, rbdDraggableId } = target.dataset;
     const row = Number(rowIdx);
     const col = Number(colIdx);
@@ -34,10 +35,37 @@ const DraggableWrapper = ({
     const newSrcDraggable =
       isSameCol && (metaKey || ctrlKey) ? new Map(srcDraggable) : new Map();
 
+    // 같은 칼럼에서 ctrl을 누른 채로, 이미 클릭되어 있다면
     if (srcDraggable.has(id) && isSameCol && (metaKey || ctrlKey)) {
       newSrcDraggable.delete(id);
+      // 클릭되어 있지 않다면(shift를 눌렀거나 그냥 눌렀거나)
     } else {
-      newSrcDraggable.set(id, { row, col, id: rbdDraggableId });
+      // shift를 누른 채라면
+      if (shiftKey) {
+        const sorted =
+          srcDraggable.size && isSameCol
+            ? sortSrcDraggableByRow([...srcDraggable])
+            : null;
+
+        // 첫 번째가 있다면? 첫 번째부터 target까지
+        if (srcDraggable.size && sorted && rowIdx > sorted[0].row) {
+          // 아래 방향만 유효
+          for (let i = sorted[0].row; i <= rowIdx; i++) {
+            const item = itemList[i];
+            newSrcDraggable.set(getNumberFromId(item.id), {
+              row: i,
+              col,
+              id: item.id,
+            });
+          }
+          // 첫 번째가 없다면? target만
+        } else {
+          newSrcDraggable.set(id, { row, col, id: rbdDraggableId });
+        }
+        // 그냥 눌렀다면
+      } else {
+        newSrcDraggable.set(id, { row, col, id: rbdDraggableId });
+      }
     }
 
     setSrcDraggable(newSrcDraggable);
@@ -89,6 +117,7 @@ export default DraggableWrapper;
 
 DraggableWrapper.propTypes = {
   item: PropTypes.object,
+  itemList: PropTypes.array,
   itemIndex: PropTypes.number,
   droppableIdx: PropTypes.number,
   srcDraggable: PropTypes.object,
