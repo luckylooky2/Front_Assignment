@@ -54,7 +54,6 @@ export default function App() {
   };
 
   const handleDragEnd = (result) => {
-    setSrcDraggable(new Map());
     setFirstPicked(null);
     // 아무런 변화도 없는 경우
     if (
