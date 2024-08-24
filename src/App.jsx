@@ -21,7 +21,8 @@ export default function App() {
   const [itemLists, setItemLists] = useState(
     createItemLists(COLUMN_COUNT, INITIAL_ITEM_COUNT),
   );
-  const [srcDraggable, setSrcDraggable] = useState(null);
+  const [srcDraggable, setSrcDraggable] = useState(new Map());
+  const [firstPicked, setFirstPicked] = useState(null);
   const [dstDraggableState, setDstDraggableState] = useState(
     dstDraggableStateCreator(true),
   );
@@ -52,6 +53,9 @@ export default function App() {
   };
 
   const handleDragEnd = (result) => {
+    setSrcDraggable(new Map());
+    setFirstPicked(null);
+    // 아무런 변화도 없는 경우
     if (
       !result.destination ||
       (result.source.droppableId === result.destination.droppableId &&
@@ -61,27 +65,40 @@ export default function App() {
       return;
     }
 
+    // 드롭하는 곳이 조건과 맞지 않을 경우
     if (!dstDraggableState.isValid) {
       setDstDraggableState(dstDraggableStateCreator(true));
       addResult(false);
       return;
     }
 
-    const { droppableId: startId, index: startRow } = result.source;
     const { droppableId: endId, index: endRow } = result.destination;
-    const [startCol, endCol] = [Number(startId.at(-1)), Number(endId.at(-1))];
-    const newItems = reorder(itemLists, [startCol, startRow], [endCol, endRow]);
+    const targets = [...srcDraggable]
+      .map(([_id, src]) => src)
+      .sort((a, b) => a.row - b.row);
+    const [endCol] = [Number(endId.split('-')[1])];
+    const newItems = reorder(itemLists, targets, [endCol, endRow]);
 
     setItemLists(newItems);
-    setSrcDraggable(null);
     addResult(true);
     setDstDraggableState(dstDraggableStateCreator(true));
   };
 
   const handleDragStart = ({ source, draggableId }) => {
-    const droppableIdx = Number(source.droppableId.at(-1));
+    const droppableIdx = Number(source.droppableId.split('-')[1]);
+    const id = Number(draggableId.split('-')[1]);
 
-    setSrcDraggable({
+    // 다른 것으로
+    if (!srcDraggable.has(id)) {
+      const newSrcDraggable = new Map();
+      newSrcDraggable.set(id, {
+        row: source.index,
+        col: droppableIdx,
+        id: draggableId,
+      });
+      setSrcDraggable(newSrcDraggable);
+    }
+    setFirstPicked({
       row: source.index,
       col: droppableIdx,
       id: draggableId,
@@ -92,10 +109,11 @@ export default function App() {
     setDstDraggableState(dstDraggableStateCreator(true));
 
     if (destination === null) {
+      setDstDraggableState(dstDraggableStateCreator(false));
       return;
     }
 
-    const droppableIdx = Number(destination.droppableId.at(-1));
+    const droppableIdx = Number(destination.droppableId.split('-')[1]);
     const dstDraggable = {
       row: destination.index,
       col: droppableIdx,
@@ -103,16 +121,12 @@ export default function App() {
     };
     let invalidMsg = null;
 
-    if (isDraggableIdxValid(srcDraggable, dstDraggable, itemLists)) {
+    if (isDraggableIdxValid(firstPicked, dstDraggable, itemLists)) {
       invalidMsg = '짝수 아이템을 짝수 아이템 앞으로 옮길 수 없습니다';
     } else if (
-      isDroppableIdxValid(
-        srcDraggable,
-        dstDraggable,
-        BANNED_COLUMN_MOVING_RULES,
-      )
+      isDroppableIdxValid(firstPicked, dstDraggable, BANNED_COLUMN_MOVING_RULES)
     ) {
-      invalidMsg = `칼럼 ${srcDraggable.col + 1}에서 칼럼 ${dstDraggable.col + 1}로 옮길 수 없습니다`;
+      invalidMsg = `칼럼 ${firstPicked.col + 1}에서 칼럼 ${dstDraggable.col + 1}로 옮길 수 없습니다`;
     }
     if (invalidMsg) {
       setDstDraggableState(dstDraggableStateCreator(false, invalidMsg));
@@ -133,7 +147,9 @@ export default function App() {
               itemList={itemList}
               droppableIdx={index}
               srcDraggable={srcDraggable}
+              setSrcDraggable={setSrcDraggable}
               dstDraggableState={dstDraggableState}
+              firstPicked={firstPicked}
             />
           ))}
         </div>
