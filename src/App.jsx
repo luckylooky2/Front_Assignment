@@ -76,7 +76,7 @@ export default function App() {
     const targets = [...srcDraggable]
       .map(([_id, src]) => src)
       .sort((a, b) => a.row - b.row);
-    const [endCol] = [Number(endId.split('-')[1])];
+    const endCol = Number(endId.split('-')[1]);
     const newItems = reorder(itemLists, targets, [endCol, endRow]);
 
     setItemLists(newItems);
