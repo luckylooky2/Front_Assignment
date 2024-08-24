@@ -12,6 +12,15 @@ export const createItemLists = (columnCount, initCount) => {
   return itemCountsPerColumn.map((count) => getItems(count));
 };
 
+const updateRowCol = (srcDraggable, endCol, endRow) => {
+  let offset = 0;
+  for (const elem of srcDraggable) {
+    elem.col = endCol;
+    elem.row = endRow + offset;
+    offset++;
+  }
+};
+
 export const reorder = (lists, arrayToMove, endPoint) => {
   const { col: startCol } = arrayToMove[0];
   const [endCol, endRow] = endPoint;
@@ -38,9 +47,11 @@ export const reorder = (lists, arrayToMove, endPoint) => {
 
   if (startCol === endCol) {
     from.splice(endRow, 0, ...removed);
+    updateRowCol(arrayToMove, endCol, endRow);
   } else {
     const to = [...lists[endCol]];
     to.splice(endRow, 0, ...removed);
+    updateRowCol(arrayToMove, endCol, endRow);
     newLists[endCol] = to;
   }
   newLists[startCol] = from;
