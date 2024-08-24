@@ -12,21 +12,39 @@ export const createItemLists = (columnCount, initCount) => {
   return itemCountsPerColumn.map((count) => getItems(count));
 };
 
-export const reorder = (lists, startPoint, endPoint) => {
-  const [startCol, startRow] = startPoint;
+export const reorder = (lists, arrayToMove, endPoint) => {
+  const { col: startCol } = arrayToMove[0];
   const [endCol, endRow] = endPoint;
   const newLists = [...lists];
-  const from = [...lists[startCol]];
-  const [removed] = from.splice(startRow, 1);
+  const isSelected = lists[startCol].map(() => false);
+  const [removed, from] = [[], []];
+
+  for (const elem of arrayToMove) {
+    isSelected[elem.row] = true;
+  }
+
+  // console.log(from);
+
+  const oldFrom = lists[startCol];
+  for (let i = 0; i < oldFrom.length; i++) {
+    if (isSelected[i]) {
+      removed.push(oldFrom[i]);
+    } else {
+      from.push(oldFrom[i]);
+    }
+  }
+
+  // console.log(removed, from);
 
   if (startCol === endCol) {
-    from.splice(endRow, 0, removed);
+    from.splice(endRow, 0, ...removed);
   } else {
     const to = [...lists[endCol]];
-    to.splice(endRow, 0, removed);
+    to.splice(endRow, 0, ...removed);
     newLists[endCol] = to;
   }
   newLists[startCol] = from;
+
   return newLists;
 };
 
@@ -46,8 +64,8 @@ export const isDraggableIdxValid = (src, dst, itemLists) => {
   if (itemLists[dst.col][lower] === undefined) {
     return false;
   } else {
-    const upperId = Number(itemLists[src.col][upper].id.at(-1));
-    const lowerId = Number(itemLists[dst.col][lower].id.at(-1));
+    const upperId = Number(itemLists[src.col][upper].id.split('-')[1]);
+    const lowerId = Number(itemLists[dst.col][lower].id.split('-')[1]);
 
     if (!(upperId % 2) && !(lowerId % 2)) {
       return true;
