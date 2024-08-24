@@ -18,13 +18,9 @@ const DraggableWrapper = ({
   const styles = getDndStyles;
   const { isValid, invalidMsg } = dstDraggableState;
 
-  const handleClick = ({
-    target,
-    metaKey,
-    ctrlKey,
-    // shiftKey
-  }) => {
-    // console.log(metaKey);
+  const handleClick = (event) => {
+    event.stopPropagation();
+    const { target, metaKey, ctrlKey } = event;
     const { rowIdx, colIdx, rbdDraggableId } = target.dataset;
     const row = Number(rowIdx);
     const col = Number(colIdx);

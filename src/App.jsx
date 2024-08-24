@@ -133,13 +133,22 @@ export default function App() {
     }
   };
 
+  const handleResetSrcDraggable = () => {
+    if (firstPicked === null) {
+      setSrcDraggable(new Map());
+    }
+  };
+
   return (
     <DragDropContext
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragUpdate={handleDragUpdate}
     >
-      <section className={styles.appContainer}>
+      <section
+        className={styles.appContainer}
+        onClick={handleResetSrcDraggable}
+      >
         <div className={styles.droppableContainer}>
           {itemLists.map((itemList, index) => (
             <DroppableWrapper
