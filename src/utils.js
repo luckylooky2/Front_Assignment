@@ -107,3 +107,7 @@ export const dstDraggableStateCreator = (isValid, invalidMsg = '') => ({
 export const getNumberFromId = (string) => {
   return Number(string.split('-')[1]);
 };
+
+export const sortSrcDraggableByRow = (arr) => {
+  return arr.map(([_id, src]) => src).sort((a, b) => a.row - b.row);
+};

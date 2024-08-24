@@ -16,6 +16,7 @@ import {
   isDroppableIdxValid,
   dstDraggableStateCreator,
   getNumberFromId,
+  sortSrcDraggableByRow,
 } from './utils';
 
 export default function App() {
@@ -73,9 +74,7 @@ export default function App() {
     }
 
     const { droppableId: endId, index: endRow } = result.destination;
-    const targets = [...srcDraggable]
-      .map(([_id, src]) => src)
-      .sort((a, b) => a.row - b.row);
+    const targets = sortSrcDraggableByRow([...srcDraggable]);
     const endCol = getNumberFromId(endId);
     const newItems = reorder(itemLists, targets, [endCol, endRow]);
 
