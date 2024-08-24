@@ -27,6 +27,7 @@ const DroppableWrapper = ({
             <DraggableWrapper
               key={`draggable-${index}`}
               item={item}
+              itemList={itemList}
               droppableIdx={droppableIdx}
               itemIndex={index}
               srcDraggable={srcDraggable}
