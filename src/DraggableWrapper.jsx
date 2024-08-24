@@ -18,7 +18,13 @@ const DraggableWrapper = ({
   const styles = getDndStyles;
   const { isValid, invalidMsg } = dstDraggableState;
 
-  const handleClick = ({ target }) => {
+  const handleClick = ({
+    target,
+    metaKey,
+    ctrlKey,
+    // shiftKey
+  }) => {
+    // console.log(metaKey);
     const { rowIdx, colIdx, rbdDraggableId } = target.dataset;
     const row = Number(rowIdx);
     const col = Number(colIdx);
@@ -29,9 +35,10 @@ const DraggableWrapper = ({
       const oldSrcDraggable = [...srcDraggable];
       isSameCol = col === oldSrcDraggable[0][1].col;
     }
-    const newSrcDraggable = isSameCol ? new Map(srcDraggable) : new Map();
+    const newSrcDraggable =
+      isSameCol && (metaKey || ctrlKey) ? new Map(srcDraggable) : new Map();
 
-    if (srcDraggable.has(id) && isSameCol) {
+    if (srcDraggable.has(id) && isSameCol && (metaKey || ctrlKey)) {
       newSrcDraggable.delete(id);
     } else {
       newSrcDraggable.set(id, { row, col, id: rbdDraggableId });
@@ -45,13 +52,15 @@ const DraggableWrapper = ({
       {(provided, snapshot) => {
         const isSrcDraggable = srcDraggable.has(getNumberFromId(item.id));
         const isSelected = snapshot.isDragging || isSrcDraggable;
-        const isMulti =
+        const isFirstPicked = !!firstPicked && firstPicked.id === item.id;
+        const isBlur =
           isSrcDraggable &&
           srcDraggable.size > 1 &&
           !!firstPicked &&
           firstPicked.id !== item.id;
-        const isMsgOpen =
-          !isValid && !!firstPicked && firstPicked.id === item.id && invalidMsg;
+        const isMulti =
+          isSrcDraggable && srcDraggable.size > 1 && isFirstPicked;
+        const isMsgOpen = !isValid && isFirstPicked && invalidMsg;
 
         return (
           <div
@@ -63,11 +72,16 @@ const DraggableWrapper = ({
             onClick={handleClick}
             className={cx(
               styles.item(isSelected, isValid, provided.draggableProps.style),
-              styles.itemBlur(isMulti),
+              styles.itemBlur(isBlur),
             )}
           >
             {item.content}
             {isMsgOpen && <div className={styles.invalidMsg}>{invalidMsg}</div>}
+            {isMulti && (
+              <div className={styles.countCircle}>
+                <span>{srcDraggable.size}</span>
+              </div>
+            )}
           </div>
         );
       }}

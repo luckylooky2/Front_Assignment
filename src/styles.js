@@ -12,9 +12,9 @@ export const getDndStyles = {
       position: 'relative',
       ...draggableStyle,
     }),
-  itemBlur: (isMulti) =>
+  itemBlur: (isBlur) =>
     css({
-      opacity: isMulti ? 0.3 : 1,
+      opacity: isBlur ? 0.3 : 1,
     }),
   list: (isDraggingOver) =>
     css({
@@ -34,6 +34,18 @@ export const getDndStyles = {
     border: '1px solid black',
     whiteSpace: 'nowrap',
     zIndex: '10',
+  }),
+  countCircle: css({
+    position: 'absolute',
+    top: '-15%',
+    right: '-5%',
+    backgroundColor: 'orange',
+    borderRadius: '50%',
+    width: '25px',
+    height: '25px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   }),
 };
 
