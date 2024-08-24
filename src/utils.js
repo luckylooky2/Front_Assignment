@@ -4,7 +4,7 @@ const getItems = (count) =>
     content: `item ${k}`,
   }));
 
-export const createListsUpToColumnCount = (columnCount, initCount) => {
+export const createItemLists = (columnCount, initCount) => {
   const itemCountsPerColumn = [initCount].concat(
     Array.from({ length: columnCount - 1 }).fill(0),
   );

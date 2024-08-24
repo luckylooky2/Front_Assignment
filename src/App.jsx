@@ -3,10 +3,14 @@ import { DragDropContext } from 'react-beautiful-dnd';
 
 import DroppableWrapper from './DroppableWrapper';
 import ResultMessage from './ResultMessage';
-import { COLUMN_COUNT, BANNED_COLUMN_MOVING_RULES } from './constant';
+import {
+  COLUMN_COUNT,
+  INITIAL_ITEM_COUNT,
+  BANNED_COLUMN_MOVING_RULES,
+} from './constant';
 import { getLayoutStyles } from './styles';
 import {
-  createListsUpToColumnCount,
+  createItemLists,
   reorder,
   isDraggableIdxValid,
   isDroppableIdxValid,
@@ -15,7 +19,7 @@ import {
 
 export default function App() {
   const [itemLists, setItemLists] = useState(
-    createListsUpToColumnCount(COLUMN_COUNT, 10),
+    createItemLists(COLUMN_COUNT, INITIAL_ITEM_COUNT),
   );
   const [srcDraggable, setSrcDraggable] = useState(null);
   const [dstDraggableState, setDstDraggableState] = useState(
