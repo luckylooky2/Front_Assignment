@@ -45,6 +45,7 @@ export const getNotificationStyles = {
     position: 'absolute',
     top: '0%',
     right: '0%',
+    pointerEvents: 'none',
   }),
   result: (isSuccess, visible) =>
     css({
