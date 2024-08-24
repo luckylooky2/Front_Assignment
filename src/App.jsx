@@ -3,7 +3,7 @@ import { DragDropContext } from 'react-beautiful-dnd';
 
 import DroppableWrapper from './DroppableWrapper';
 import ResultMessage from './ResultMessage';
-import { COLUMN_COUNT, bannedMovingColumnRules } from './constant';
+import { COLUMN_COUNT, BANNED_COLUMN_MOVING_RULES } from './constant';
 import { getLayoutStyles } from './styles';
 import {
   createListsUpToColumnCount,
@@ -48,7 +48,16 @@ export default function App() {
   };
 
   const handleDragEnd = (result) => {
-    if (!result.destination || !dstDraggableState.isValid) {
+    if (
+      !result.destination ||
+      (result.source.droppableId === result.destination.droppableId &&
+        result.source.index === result.destination.index)
+    ) {
+      setDstDraggableState(dstDraggableStateCreator(true));
+      return;
+    }
+
+    if (!dstDraggableState.isValid) {
       setDstDraggableState(dstDraggableStateCreator(true));
       addResult(false);
       return;
@@ -93,7 +102,11 @@ export default function App() {
     if (isDraggableIdxValid(srcDraggable, dstDraggable, itemLists)) {
       invalidMsg = '짝수 아이템을 짝수 아이템 앞으로 옮길 수 없습니다';
     } else if (
-      isDroppableIdxValid(srcDraggable, dstDraggable, bannedMovingColumnRules)
+      isDroppableIdxValid(
+        srcDraggable,
+        dstDraggable,
+        BANNED_COLUMN_MOVING_RULES,
+      )
     ) {
       invalidMsg = `칼럼 ${srcDraggable.col + 1}에서 칼럼 ${dstDraggable.col + 1}로 옮길 수 없습니다`;
     }
