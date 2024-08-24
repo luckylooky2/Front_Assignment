@@ -30,47 +30,26 @@ export const reorder = (lists, startPoint, endPoint) => {
   return newLists;
 };
 
-export const isDraggableIdxValid = (srcDraggable, dstDraggable, itemLists) => {
-  if (srcDraggable === null || dstDraggable === null) {
+export const isDraggableIdxValid = (src, dst, itemLists) => {
+  if (src === null || dst === null) {
     return false;
   }
 
-  if (
-    srcDraggable.row === dstDraggable.row &&
-    srcDraggable.col === dstDraggable.col
-  ) {
+  if (src.row === dst.row && src.col === dst.col) {
     return false;
   }
 
-  const dstItemList = itemLists[dstDraggable.col];
+  const upper = src.row;
+  const offset = src.col === dst.col && src.row < dst.row ? 1 : 0;
+  const lower = dst.row + offset;
 
-  let newItemList;
-  if (srcDraggable.col === dstDraggable.col) {
-    const from = dstItemList.slice().map((v) => v.id);
-    const [removed] = from.splice(srcDraggable.row, 1);
-    from.splice(dstDraggable.row, 0, removed);
-    newItemList = from;
+  if (itemLists[dst.col][lower] === undefined) {
+    return false;
   } else {
-    // [0, 1, 2, 3] 의 2에 push
-    const front = dstDraggable.row
-      ? dstItemList.slice(0, dstDraggable.row).map((v) => v.id)
-      : []; // [0, 1]
-    const mid = [dstDraggable.id]; // [2]
-    const back =
-      dstDraggable.row < dstItemList.length
-        ? dstItemList.slice(dstDraggable.row).map((v) => v.id)
-        : []; // [2, 3]
-    newItemList = front.concat(mid).concat(back);
-  }
+    const upperId = Number(itemLists[src.col][upper].id.at(-1));
+    const lowerId = Number(itemLists[dst.col][lower].id.at(-1));
 
-  // 현재 옮기려는 것이 아니라 하나라도 짝수 위의 짝수가 있으면 true 리턴?
-  if (newItemList.length > 1 && dstDraggable.row < newItemList.length - 1) {
-    const first = dstDraggable.row;
-    const second = first + 1;
-    const upper = Number(newItemList[first].at(-1));
-    const lower = Number(newItemList[second].at(-1));
-
-    if (!(upper % 2) && !(lower % 2)) {
+    if (!(upperId % 2) && !(lowerId % 2)) {
       return true;
     }
   }
@@ -78,17 +57,13 @@ export const isDraggableIdxValid = (srcDraggable, dstDraggable, itemLists) => {
   return false;
 };
 
-export const isDroppableIdxValid = (
-  srcDraggable,
-  dstDraggable,
-  bannedMovingColumnRules,
-) => {
-  if (srcDraggable === null || dstDraggable === null) {
+export const isDroppableIdxValid = (src, dst, bannedRules) => {
+  if (src === null || dst === null) {
     return false;
   }
 
-  for (const [bannedSrc, bannedDst] of bannedMovingColumnRules) {
-    if (srcDraggable.col === bannedSrc && dstDraggable.col === bannedDst) {
+  for (const [bannedSrc, bannedDst] of bannedRules) {
+    if (src.col === bannedSrc && dst.col === bannedDst) {
       return true;
     }
   }
