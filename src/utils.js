@@ -21,8 +21,8 @@ const updateRowCol = (srcDraggable, endCol, endRow) => {
   }
 };
 
-export const reorder = (lists, arrayToMove, endPoint) => {
-  const { col: startCol } = arrayToMove[0];
+export const reorder = (lists, arrayToMove, startPoint, endPoint) => {
+  const [startCol, startRow] = startPoint;
   const [endCol, endRow] = endPoint;
   const newLists = [...lists];
   const isSelected = lists[startCol].map(() => false);
@@ -32,10 +32,9 @@ export const reorder = (lists, arrayToMove, endPoint) => {
     isSelected[elem.row] = true;
   }
 
-  // console.log(from);
-
   const oldFrom = lists[startCol];
   for (let i = 0; i < oldFrom.length; i++) {
+    console.log(oldFrom[i]);
     if (isSelected[i]) {
       removed.push(oldFrom[i]);
     } else {
@@ -43,13 +42,15 @@ export const reorder = (lists, arrayToMove, endPoint) => {
     }
   }
 
-  // console.log(removed, from);
-
   if (startCol === endCol) {
-    from.splice(endRow, 0, ...removed);
-    updateRowCol(arrayToMove, endCol, endRow);
+    // 위 방향으로 이동할 때 고려
+    const offset = endRow > startRow ? removed.length - 1 : 0;
+
+    from.splice(endRow - offset, 0, ...removed);
+    updateRowCol(arrayToMove, endCol, endRow - offset);
   } else {
     const to = [...lists[endCol]];
+
     to.splice(endRow, 0, ...removed);
     updateRowCol(arrayToMove, endCol, endRow);
     newLists[endCol] = to;

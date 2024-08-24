@@ -73,10 +73,19 @@ export default function App() {
       return;
     }
 
+    const { droppableId: startId, index: startRow } = result.source;
     const { droppableId: endId, index: endRow } = result.destination;
     const targets = sortSrcDraggableByRow([...srcDraggable]);
-    const endCol = getNumberFromId(endId);
-    const newItems = reorder(itemLists, targets, [endCol, endRow]);
+    const [startCol, endCol] = [
+      getNumberFromId(startId),
+      getNumberFromId(endId),
+    ];
+    const newItems = reorder(
+      itemLists,
+      targets,
+      [startCol, startRow],
+      [endCol, endRow],
+    );
 
     setItemLists(newItems);
     addResult(true);
@@ -113,6 +122,7 @@ export default function App() {
     }
 
     const droppableIdx = getNumberFromId(destination.droppableId);
+    // draggableCreator 적용
     const dstDraggable = {
       row: destination.index,
       col: droppableIdx,
@@ -120,13 +130,14 @@ export default function App() {
     };
     let invalidMsg = null;
 
-    if (isDraggableIdxValid(firstPicked, dstDraggable, itemLists)) {
-      invalidMsg = '짝수 아이템을 짝수 아이템 앞으로 옮길 수 없습니다';
-    } else if (
+    if (
       isDroppableIdxValid(firstPicked, dstDraggable, BANNED_COLUMN_MOVING_RULES)
     ) {
       invalidMsg = `칼럼 ${firstPicked.col + 1}에서 칼럼 ${dstDraggable.col + 1}로 옮길 수 없습니다`;
+    } else if (isDraggableIdxValid(firstPicked, dstDraggable, itemLists)) {
+      invalidMsg = '짝수 아이템을 짝수 아이템 앞으로 옮길 수 없습니다';
     }
+
     if (invalidMsg) {
       setDstDraggableState(dstDraggableStateCreator(false, invalidMsg));
     }
@@ -166,3 +177,7 @@ export default function App() {
     </DragDropContext>
   );
 }
+
+// 3, 5, 7 선택(3, 4, 5 도 이상함)
+// 1) 2 위로 : OK
+// 2) 2 아래로 : NO
