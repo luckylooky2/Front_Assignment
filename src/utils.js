@@ -64,8 +64,8 @@ export const isDraggableIdxValid = (src, dst, itemLists) => {
   if (itemLists[dst.col][lower] === undefined) {
     return false;
   } else {
-    const upperId = Number(itemLists[src.col][upper].id.split('-')[1]);
-    const lowerId = Number(itemLists[dst.col][lower].id.split('-')[1]);
+    const upperId = getNumberFromId(itemLists[src.col][upper].id);
+    const lowerId = getNumberFromId(itemLists[dst.col][lower].id);
 
     if (!(upperId % 2) && !(lowerId % 2)) {
       return true;
@@ -92,3 +92,7 @@ export const dstDraggableStateCreator = (isValid, invalidMsg = '') => ({
   isValid,
   invalidMsg,
 });
+
+export const getNumberFromId = (string) => {
+  return Number(string.split('-')[1]);
+};

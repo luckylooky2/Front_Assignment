@@ -15,6 +15,7 @@ import {
   isDraggableIdxValid,
   isDroppableIdxValid,
   dstDraggableStateCreator,
+  getNumberFromId,
 } from './utils';
 
 export default function App() {
@@ -76,7 +77,7 @@ export default function App() {
     const targets = [...srcDraggable]
       .map(([_id, src]) => src)
       .sort((a, b) => a.row - b.row);
-    const endCol = Number(endId.split('-')[1]);
+    const endCol = getNumberFromId(endId);
     const newItems = reorder(itemLists, targets, [endCol, endRow]);
 
     setItemLists(newItems);
@@ -85,8 +86,8 @@ export default function App() {
   };
 
   const handleDragStart = ({ source, draggableId }) => {
-    const droppableIdx = Number(source.droppableId.split('-')[1]);
-    const id = Number(draggableId.split('-')[1]);
+    const droppableIdx = getNumberFromId(source.droppableId);
+    const id = getNumberFromId(draggableId);
 
     // 다른 것으로
     if (!srcDraggable.has(id)) {
@@ -113,7 +114,7 @@ export default function App() {
       return;
     }
 
-    const droppableIdx = Number(destination.droppableId.split('-')[1]);
+    const droppableIdx = getNumberFromId(destination.droppableId);
     const dstDraggable = {
       row: destination.index,
       col: droppableIdx,

@@ -4,6 +4,7 @@ import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 
 import { getDndStyles } from './styles';
+import { getNumberFromId } from './utils';
 
 const DraggableWrapper = ({
   item,
@@ -21,7 +22,7 @@ const DraggableWrapper = ({
     const { rowIdx, colIdx, rbdDraggableId } = target.dataset;
     const row = Number(rowIdx);
     const col = Number(colIdx);
-    const id = Number(rbdDraggableId.split('-')[1]);
+    const id = getNumberFromId(rbdDraggableId);
     let isSameCol = false;
 
     if (srcDraggable.size) {
@@ -42,11 +43,16 @@ const DraggableWrapper = ({
   return (
     <Draggable key={item.id} draggableId={item.id} index={itemIndex}>
       {(provided, snapshot) => {
-        const isSrcDraggable = srcDraggable.has(Number(item.id.split('-')[1]));
+        const isSrcDraggable = srcDraggable.has(getNumberFromId(item.id));
         const isSelected = snapshot.isDragging || isSrcDraggable;
-        const isMulti = isSrcDraggable && srcDraggable.size > 1 && firstPicked;
+        const isMulti =
+          isSrcDraggable &&
+          srcDraggable.size > 1 &&
+          !!firstPicked &&
+          firstPicked.id !== item.id;
         const isMsgOpen =
-          !isValid && firstPicked && firstPicked.id === item.id && invalidMsg;
+          !isValid && !!firstPicked && firstPicked.id === item.id && invalidMsg;
+
         return (
           <div
             ref={provided.innerRef}
