@@ -3,15 +3,18 @@ import { css } from '@emotion/css';
 import { GRID } from './constant';
 
 export const getDndStyles = {
-  item: (isDragging, draggableStyle, canDrop) =>
+  item: (isSelected, isValid, draggableStyle) =>
     css({
       userSelect: 'none',
       padding: `${GRID * 2}px`,
       margin: `0 0 ${GRID}px 0`,
-      background: isDragging ? (canDrop ? 'lightgreen' : 'red') : 'grey',
-      transition: 'background-color 0.5s ease-in-out',
+      background: isSelected ? (isValid ? 'lightgreen' : 'red') : 'grey',
       position: 'relative',
       ...draggableStyle,
+    }),
+  itemBlur: (isMulti) =>
+    css({
+      opacity: isMulti ? 0.3 : 1,
     }),
   list: (isDraggingOver) =>
     css({
@@ -24,7 +27,6 @@ export const getDndStyles = {
     position: 'absolute',
     top: '110%',
     left: '0%',
-    // transform: 'translateX(-50%)',
     backgroundColor: 'rgb(200, 200, 200)',
     color: 'black',
     padding: '8px',
