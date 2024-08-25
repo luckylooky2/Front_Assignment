@@ -1,17 +1,3 @@
-const getItems = (count) =>
-  Array.from({ length: count }, (v, k) => k).map((k) => ({
-    id: `item-${k}`,
-    content: `item ${k}`,
-  }));
-
-// columnCount: 칼럼 개수
-// initCount: 초기 아이템 개수
-export const createItemLists = (columnCount, initCount) => {
-  const itemCountsPerColumn = [initCount].concat(Array.from({ length: columnCount - 1 }).fill(0));
-
-  return itemCountsPerColumn.map((count) => getItems(count));
-};
-
 // srcDraggable: 이동 후 업데이트할 대상
 // dstCol: 드랍 지점 칼럼 인덱스
 // dstRow: 드랍 지점 로우 인덱스
@@ -146,11 +132,6 @@ export const isDroppableIdxValid = (srcPoint, dstPoint, bannedRules) => {
   return false;
 };
 
-export const dstDraggableStateCreator = (isValid, invalidMsg = '') => ({
-  isValid,
-  invalidMsg,
-});
-
 export const getNumberFromId = (string) => {
   return Number(string.split('-')[1]);
 };
@@ -158,5 +139,3 @@ export const getNumberFromId = (string) => {
 export const sortSrcDraggableByRow = (arr) => {
   return arr.map(([_id, src]) => src).sort((a, b) => a.row - b.row);
 };
-
-export const initialSrcDraggableGenerator = (arr) => arr.map((v) => [v, { row: v, col: 0, id: `item-${v}` }]);

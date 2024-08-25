@@ -4,19 +4,12 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import DroppableWrapper from './DroppableWrapper';
 import ResultMessage from './ResultMessage';
 import { COLUMN_COUNT, INITIAL_ITEM_COUNT, INITIAL_SRC_DRAGGABLE, BANNED_COLUMN_MOVING_RULES } from './constant';
+import { itemListscreator, dstDraggableStateCreator } from './creator';
 import { getLayoutStyles } from './styles';
-import {
-  createItemLists,
-  reorder,
-  isDraggableIdxValid,
-  isDroppableIdxValid,
-  dstDraggableStateCreator,
-  getNumberFromId,
-  sortSrcDraggableByRow,
-} from './utils';
+import { reorder, isDraggableIdxValid, isDroppableIdxValid, getNumberFromId, sortSrcDraggableByRow } from './utils';
 
 export default function App() {
-  const [itemLists, setItemLists] = useState(createItemLists(COLUMN_COUNT, INITIAL_ITEM_COUNT));
+  const [itemLists, setItemLists] = useState(itemListscreator(COLUMN_COUNT, INITIAL_ITEM_COUNT));
   const [srcDraggable, setSrcDraggable] = useState(new Map(INITIAL_SRC_DRAGGABLE));
   const [pickedDraggable, setPickedDraggable] = useState(null);
   const [dstDraggableState, setDstDraggableState] = useState(dstDraggableStateCreator(true));
