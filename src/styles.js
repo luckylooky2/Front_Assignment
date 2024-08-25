@@ -1,6 +1,17 @@
-import { css } from '@emotion/css';
+import { css, injectGlobal } from '@emotion/css';
 
 import { GRID } from './constant';
+
+injectGlobal`
+  @font-face {
+    font-family: 'Roboto-Regular', sans-serif;
+    src: url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap') format('truetype');
+  }
+
+  body {
+   font-family: 'Roboto-Regular', sans-serif;
+  }
+`;
 
 export const getDndStyles = {
   item: (isSelected, isValid, draggableStyle) =>
@@ -8,8 +19,9 @@ export const getDndStyles = {
       userSelect: 'none',
       padding: `${GRID * 2}px`,
       margin: `0 0 ${GRID}px 0`,
-      background: isSelected ? (isValid ? 'lightgreen' : 'red') : 'grey',
+      background: isSelected ? (isValid ? 'lightgreen' : 'lightcoral') : 'white',
       position: 'relative',
+      borderRadius: '10px',
       ...draggableStyle,
     }),
   itemBlur: (isBlur) =>
@@ -19,7 +31,8 @@ export const getDndStyles = {
   list: (isDraggingOver) =>
     css({
       border: `${GRID}px solid white`,
-      background: isDraggingOver ? 'lightblue' : 'lightgrey',
+      borderRadius: '20px',
+      background: isDraggingOver ? 'lightblue' : 'gainsboro',
       padding: `${GRID}px`,
       width: '250px',
     }),
@@ -27,11 +40,11 @@ export const getDndStyles = {
     position: 'absolute',
     top: '110%',
     left: '0%',
-    backgroundColor: 'rgb(200, 200, 200)',
+    backgroundColor: 'lavenderblush',
     color: 'black',
     padding: '8px',
     borderRadius: '4px',
-    border: '1px solid black',
+    border: '1px solid transparent',
     whiteSpace: 'nowrap',
     zIndex: '10',
   }),
@@ -71,7 +84,7 @@ export const getNotificationStyles = {
       padding: '8px',
       marginBottom: '3px',
       borderRadius: '4px',
-      border: `3px solid ${isSuccess ? 'green' : 'red'}`,
+      border: `3px solid ${isSuccess ? 'lightgreen' : 'red'}`,
       whiteSpace: 'nowrap',
       zIndex: '10',
       opacity: `${visible ? 1 : 0}`,
