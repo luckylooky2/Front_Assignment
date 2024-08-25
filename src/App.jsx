@@ -92,9 +92,9 @@ export default function App() {
     let invalidMsg = null;
 
     if (isDroppableIdxValid(pickedDraggable, dstDraggable, BANNED_COLUMN_MOVING_RULES)) {
-      invalidMsg = `칼럼 ${pickedDraggable.col + 1}에서 칼럼 ${dstDraggable.col + 1}로 옮길 수 없습니다`;
+      invalidMsg = `⚠️ 칼럼 ${pickedDraggable.col + 1}에서 칼럼 ${dstDraggable.col + 1}로 옮길 수 없습니다`;
     } else if (isDraggableIdxValid(itemLists, pickedDraggable, dstDraggable)) {
-      invalidMsg = '짝수 아이템을 짝수 아이템 앞으로 옮길 수 없습니다';
+      invalidMsg = '⚠️ 짝수 아이템을 짝수 아이템 앞으로 옮길 수 없습니다';
     }
 
     if (invalidMsg) {
