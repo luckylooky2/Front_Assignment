@@ -64,7 +64,7 @@ export const getDndStyles = {
 
 export const getLayoutStyles = {
   appContainer: css({ display: 'relative' }),
-  droppableContainer: css({ display: 'flex' }),
+  droppableContainer: css({ display: 'flex', justifyContent: 'center' }),
 };
 
 export const getNotificationStyles = {
