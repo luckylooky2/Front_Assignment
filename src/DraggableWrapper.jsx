@@ -14,7 +14,7 @@ const DraggableWrapper = ({
   srcDraggable,
   setSrcDraggable,
   dstDraggableState,
-  firstPicked,
+  pickedDraggable,
 }) => {
   const styles = getDndStyles;
   const { isValid, invalidMsg } = dstDraggableState;
@@ -32,8 +32,7 @@ const DraggableWrapper = ({
       const oldSrcDraggable = [...srcDraggable];
       isSameCol = col === oldSrcDraggable[0][1].col;
     }
-    const newSrcDraggable =
-      isSameCol && (metaKey || ctrlKey) ? new Map(srcDraggable) : new Map();
+    const newSrcDraggable = isSameCol && (metaKey || ctrlKey) ? new Map(srcDraggable) : new Map();
 
     // 같은 칼럼에서 ctrl을 누른 채로, 이미 클릭되어 있다면
     if (srcDraggable.has(id) && isSameCol && (metaKey || ctrlKey)) {
@@ -42,10 +41,7 @@ const DraggableWrapper = ({
     } else {
       // shift를 누른 채라면
       if (shiftKey) {
-        const sorted =
-          srcDraggable.size && isSameCol
-            ? sortSrcDraggableByRow([...srcDraggable])
-            : null;
+        const sorted = srcDraggable.size && isSameCol ? sortSrcDraggableByRow([...srcDraggable]) : null;
 
         // 첫 번째가 있다면? 첫 번째부터 target까지
         if (srcDraggable.size && sorted && rowIdx > sorted[0].row) {
@@ -76,15 +72,10 @@ const DraggableWrapper = ({
       {(provided, snapshot) => {
         const isSrcDraggable = srcDraggable.has(getNumberFromId(item.id));
         const isSelected = snapshot.isDragging || isSrcDraggable;
-        const isFirstPicked = !!firstPicked && firstPicked.id === item.id;
-        const isBlur =
-          isSrcDraggable &&
-          srcDraggable.size > 1 &&
-          !!firstPicked &&
-          firstPicked.id !== item.id;
-        const isMulti =
-          isSrcDraggable && srcDraggable.size > 1 && isFirstPicked;
-        const isMsgOpen = !isValid && isFirstPicked && invalidMsg;
+        const isPickedDraggable = !!pickedDraggable && pickedDraggable.id === item.id;
+        const isBlur = isSrcDraggable && srcDraggable.size > 1 && !!pickedDraggable && pickedDraggable.id !== item.id;
+        const isMulti = isSrcDraggable && srcDraggable.size > 1 && isPickedDraggable;
+        const isMsgOpen = !isValid && isPickedDraggable && invalidMsg;
 
         return (
           <div
@@ -94,10 +85,7 @@ const DraggableWrapper = ({
             data-col-idx={droppableIdx}
             data-row-idx={itemIndex}
             onClick={handleClick}
-            className={cx(
-              styles.item(isSelected, isValid, provided.draggableProps.style),
-              styles.itemBlur(isBlur),
-            )}
+            className={cx(styles.item(isSelected, isValid, provided.draggableProps.style), styles.itemBlur(isBlur))}
           >
             {item.content}
             {isMsgOpen && <div className={styles.invalidMsg}>{invalidMsg}</div>}
@@ -123,5 +111,5 @@ DraggableWrapper.propTypes = {
   srcDraggable: PropTypes.object,
   setSrcDraggable: PropTypes.func,
   dstDraggableState: PropTypes.object,
-  firstPicked: PropTypes.object,
+  pickedDraggable: PropTypes.object,
 };

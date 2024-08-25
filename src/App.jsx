@@ -18,7 +18,7 @@ import {
 export default function App() {
   const [itemLists, setItemLists] = useState(createItemLists(COLUMN_COUNT, INITIAL_ITEM_COUNT));
   const [srcDraggable, setSrcDraggable] = useState(new Map(INITIAL_SRC_DRAGGABLE));
-  const [firstPicked, setFirstPicked] = useState(null);
+  const [pickedDraggable, setPickedDraggable] = useState(null);
   const [dstDraggableState, setDstDraggableState] = useState(dstDraggableStateCreator(true));
   const [dragResults, setDragResults] = useState([]);
   const styles = getLayoutStyles;
@@ -43,7 +43,7 @@ export default function App() {
   };
 
   const handleDragEnd = (result) => {
-    setFirstPicked(null);
+    setPickedDraggable(null);
     // 아무런 변화도 없는 경우
     if (
       !result.destination ||
@@ -86,7 +86,7 @@ export default function App() {
       });
       setSrcDraggable(newSrcDraggable);
     }
-    setFirstPicked({
+    setPickedDraggable({
       row: source.index,
       col: srcCol,
       id: draggableId,
@@ -110,9 +110,9 @@ export default function App() {
     };
     let invalidMsg = null;
 
-    if (isDroppableIdxValid(firstPicked, dstDraggable, BANNED_COLUMN_MOVING_RULES)) {
-      invalidMsg = `칼럼 ${firstPicked.col + 1}에서 칼럼 ${dstDraggable.col + 1}로 옮길 수 없습니다`;
-    } else if (isDraggableIdxValid(itemLists, firstPicked, dstDraggable)) {
+    if (isDroppableIdxValid(pickedDraggable, dstDraggable, BANNED_COLUMN_MOVING_RULES)) {
+      invalidMsg = `칼럼 ${pickedDraggable.col + 1}에서 칼럼 ${dstDraggable.col + 1}로 옮길 수 없습니다`;
+    } else if (isDraggableIdxValid(itemLists, pickedDraggable, dstDraggable)) {
       invalidMsg = '짝수 아이템을 짝수 아이템 앞으로 옮길 수 없습니다';
     }
 
@@ -122,7 +122,7 @@ export default function App() {
   };
 
   const handleResetSrcDraggable = () => {
-    if (firstPicked === null) {
+    if (pickedDraggable === null) {
       setSrcDraggable(new Map());
     }
   };
@@ -139,7 +139,7 @@ export default function App() {
               srcDraggable={srcDraggable}
               setSrcDraggable={setSrcDraggable}
               dstDraggableState={dstDraggableState}
-              firstPicked={firstPicked}
+              pickedDraggable={pickedDraggable}
             />
           ))}
         </div>

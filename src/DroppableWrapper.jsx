@@ -11,18 +11,14 @@ const DroppableWrapper = ({
   srcDraggable,
   setSrcDraggable,
   dstDraggableState,
-  firstPicked,
+  pickedDraggable,
 }) => {
   const styles = getDndStyles;
 
   return (
     <Droppable droppableId={`droppable-${droppableIdx}`}>
       {(provided, snapshot) => (
-        <div
-          {...provided.droppableProps}
-          ref={provided.innerRef}
-          className={styles.list(snapshot.isDraggingOver)}
-        >
+        <div {...provided.droppableProps} ref={provided.innerRef} className={styles.list(snapshot.isDraggingOver)}>
           {itemList.map((item, index) => (
             <DraggableWrapper
               key={`draggable-${index}`}
@@ -33,7 +29,7 @@ const DroppableWrapper = ({
               srcDraggable={srcDraggable}
               setSrcDraggable={setSrcDraggable}
               dstDraggableState={dstDraggableState}
-              firstPicked={firstPicked}
+              pickedDraggable={pickedDraggable}
             />
           ))}
           {provided.placeholder}
@@ -51,5 +47,5 @@ DroppableWrapper.propTypes = {
   srcDraggable: PropTypes.object,
   setSrcDraggable: PropTypes.func,
   dstDraggableState: PropTypes.object,
-  firstPicked: PropTypes.object,
+  pickedDraggable: PropTypes.object,
 };
