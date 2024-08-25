@@ -95,3 +95,12 @@ export const getNotificationStyles = {
     fontSize: '17px',
   }),
 };
+
+export const getInformationStyles = {
+  info: css({
+    backgroundColor: 'lightblue',
+    borderRadius: '4px',
+    margin: '5px 0',
+    padding: '10px 0 10px 25px',
+  }),
+};

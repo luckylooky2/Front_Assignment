@@ -5,7 +5,7 @@ import DroppableWrapper from './DroppableWrapper';
 import ResultMessage from './ResultMessage';
 import { COLUMN_COUNT, INITIAL_ITEM_COUNT, INITIAL_SRC_DRAGGABLE, BANNED_COLUMN_MOVING_RULES } from './constant';
 import { itemListscreator, dstDraggableStateCreator, draggableCreator } from './creator';
-import { getLayoutStyles } from './styles';
+import { getLayoutStyles, getInformationStyles } from './styles';
 import { reorder, isDraggableIdxValid, isDroppableIdxValid, getNumberFromId, sortSrcDraggableByRow } from './utils';
 
 export default function App() {
@@ -14,7 +14,8 @@ export default function App() {
   const [pickedDraggable, setPickedDraggable] = useState(null);
   const [dstDraggableState, setDstDraggableState] = useState(dstDraggableStateCreator(true));
   const [dragResults, setDragResults] = useState([]);
-  const styles = getLayoutStyles;
+  const layoutStyles = getLayoutStyles;
+  const infoStyles = getInformationStyles;
 
   const removeResult = (id) => {
     setDragResults((prevAlerts) => prevAlerts.filter((alert) => alert.id !== id));
@@ -110,8 +111,16 @@ export default function App() {
 
   return (
     <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragUpdate={handleDragUpdate}>
-      <section className={styles.appContainer} onClick={handleResetSrcDraggable}>
-        <div className={styles.droppableContainer}>
+      <aside>
+        <div className={infoStyles.info}>
+          <b>ℹ️ 여러 항목을 선택하려면, Ctrl 키를 누른 상태에서 항목을 클릭하세요.</b>
+        </div>
+        <div className={infoStyles.info}>
+          <b>ℹ️ 연속된 항목을 선택하려면, Shift 키를 누른 상태에서 첫 번째와 마지막 항목을 클릭하세요.</b>
+        </div>
+      </aside>
+      <section className={layoutStyles.appContainer} onClick={handleResetSrcDraggable}>
+        <div className={layoutStyles.droppableContainer}>
           {itemLists.map((itemList, index) => (
             <DroppableWrapper
               key={`droppable-${index}`}
