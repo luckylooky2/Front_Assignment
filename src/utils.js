@@ -4,31 +4,31 @@ const getItems = (count) =>
     content: `item ${k}`,
   }));
 
+// columnCount: 칼럼 개수
+// initCount: 초기 아이템 개수
 export const createItemLists = (columnCount, initCount) => {
   const itemCountsPerColumn = [initCount].concat(Array.from({ length: columnCount - 1 }).fill(0));
 
   return itemCountsPerColumn.map((count) => getItems(count));
 };
 
-const updateRowCol = (srcDraggable, endCol, endRow) => {
+// srcDraggable: 이동 후 업데이트할 대상
+// dstCol: 드랍 지점 칼럼 인덱스
+// dstRow: 드랍 지점 로우 인덱스
+const updateRowCol = (srcDraggable, dstCol, dstRow) => {
   let offset = 0;
   for (const elem of srcDraggable) {
-    elem.col = endCol;
-    elem.row = endRow + offset;
+    elem.col = dstCol;
+    elem.row = dstRow + offset;
     offset++;
   }
 };
 
-const countElementsBetween2 = (targetArr, arr, currId) => {
-  let index = 0;
-
-  for (const num of targetArr) {
-    if (arr.includes(num) && currId !== num) {
-      index++;
-    }
-  }
-
-  return index;
+// candidates: 비교하고자 하는 대상 배열
+// referenceSet: 비교 기준 배열
+// srcId: 단, 제외할 대상
+const countMatchingElements = (candidates, referenceSet, srcId) => {
+  return candidates.filter((item) => referenceSet.includes(item) && srcId !== item).length;
 };
 
 const reorderWithinColumn = (list, startIndex, endIndex) => {
@@ -38,19 +38,23 @@ const reorderWithinColumn = (list, startIndex, endIndex) => {
   return result;
 };
 
-export const reorder = (lists, arrayToMove, srcs, startPoint, endPoint) => {
-  const { col: firstCol, row: firstRow } = srcs[0];
-  const [startCol, startRow, currId] = startPoint;
-  const [endCol, endRow] = endPoint;
-  const newLists = [...lists];
-  const isSelected = lists[firstCol].map(() => false);
+// itemLists: 전체 아이템 배열
+// arrayToMove: 선택 아이템(옮길 아이템) 배열
+// srcPoint: 드래그 시작 지점
+// dstPoint: 드랍 지점
+export const reorder = (itemLists, arrayToMove, srcPoint, dstPoint) => {
+  const { col: firstElemCol } = arrayToMove[0];
+  const [srcCol, srcRow, srcId] = srcPoint;
+  const [dstCol, dstRow] = dstPoint;
+  const newItemLists = [...itemLists];
+  const isSelected = itemLists[firstElemCol].map(() => false);
   const [removed, from] = [[], []];
 
   for (const elem of arrayToMove) {
     isSelected[elem.row] = true;
   }
 
-  const oldFrom = lists[firstCol];
+  const oldFrom = itemLists[firstElemCol];
 
   for (let i = 0; i < oldFrom.length; i++) {
     if (isSelected[i]) {
@@ -60,56 +64,60 @@ export const reorder = (lists, arrayToMove, srcs, startPoint, endPoint) => {
     }
   }
 
-  if (firstCol === endCol) {
-    let count = 0;
+  if (firstElemCol === dstCol) {
+    let excludeCount = 0;
     // 아래 방향
-    if (endRow >= srcs[srcs.length - 1].row) {
-      count = arrayToMove.length - 1;
+    if (dstRow >= arrayToMove[arrayToMove.length - 1].row) {
+      excludeCount = arrayToMove.length - 1;
       // 위 방향
-    } else if (endRow <= srcs[0].row) {
-      count = 0;
+    } else if (dstRow <= arrayToMove[0].row) {
+      excludeCount = 0;
+      // 중간 방향
     } else {
-      const list = reorderWithinColumn(lists[startCol], currId, endRow);
-
-      count = countElementsBetween2(
-        list.slice(0, endRow + 1).map(({ id }) => getNumberFromId(id)),
-        arrayToMove.map(({ id }) => getNumberFromId(id)),
-        currId,
-      );
+      const reordered = reorderWithinColumn(itemLists[srcCol], srcRow, dstRow);
+      const slicedIdToDst = reordered.slice(0, dstRow + 1).map(({ id }) => getNumberFromId(id));
+      const referenceSet = arrayToMove.map(({ id }) => getNumberFromId(id));
+      excludeCount = countMatchingElements(slicedIdToDst, referenceSet, srcId);
     }
 
-    from.splice(endRow - count, 0, ...removed);
-    updateRowCol(arrayToMove, endCol, endRow - count);
+    from.splice(dstRow - excludeCount, 0, ...removed);
+    updateRowCol(arrayToMove, dstCol, dstRow - excludeCount);
   } else {
-    const to = [...lists[endCol]];
+    const to = [...itemLists[dstCol]];
 
-    to.splice(endRow, 0, ...removed);
-    updateRowCol(arrayToMove, endCol, endRow);
-    newLists[endCol] = to;
+    to.splice(dstRow, 0, ...removed);
+    updateRowCol(arrayToMove, dstCol, dstRow);
+    newItemLists[dstCol] = to;
   }
-  newLists[firstCol] = from;
+  newItemLists[firstElemCol] = from;
 
-  return newLists;
+  return newItemLists;
 };
 
-export const isDraggableIdxValid = (src, dst, itemLists) => {
-  if (src === null || dst === null) {
+// itemLists: 전체 아이템 배열
+// srcPoint: 드래그 시작 지점
+// dstPoint: 드랍 지점
+export const isDraggableIdxValid = (itemLists, srcPoint, dstPoint) => {
+  if (srcPoint === null || dstPoint === null) {
     return false;
   }
 
-  if (src.row === dst.row && src.col === dst.col) {
+  const { row: srcRow, col: srcCol } = srcPoint;
+  const { row: dstRow, col: dstCol } = dstPoint;
+
+  if (srcRow === dstRow && srcCol === dstCol) {
     return false;
   }
 
-  const upper = src.row;
-  const offset = src.col === dst.col && src.row < dst.row ? 1 : 0;
-  const lower = dst.row + offset;
+  const upper = srcRow;
+  const offset = srcCol === dstCol && srcRow < dstRow ? 1 : 0;
+  const lower = dstRow + offset;
 
-  if (itemLists[dst.col][lower] === undefined) {
+  if (itemLists[dstCol][lower] === undefined) {
     return false;
   } else {
-    const upperId = getNumberFromId(itemLists[src.col][upper].id);
-    const lowerId = getNumberFromId(itemLists[dst.col][lower].id);
+    const upperId = getNumberFromId(itemLists[srcCol][upper].id);
+    const lowerId = getNumberFromId(itemLists[dstCol][lower].id);
 
     if (!(upperId % 2) && !(lowerId % 2)) {
       return true;
@@ -119,13 +127,19 @@ export const isDraggableIdxValid = (src, dst, itemLists) => {
   return false;
 };
 
-export const isDroppableIdxValid = (src, dst, bannedRules) => {
-  if (src === null || dst === null) {
+// srcPoint: 드래그 시작 지점
+// dstPoint: 드랍 지점
+// bannedRules: 칼럼 간 이동 금지 규칙 배열
+export const isDroppableIdxValid = (srcPoint, dstPoint, bannedRules) => {
+  if (srcPoint === null || dstPoint === null) {
     return false;
   }
 
+  const { col: srcCol } = srcPoint;
+  const { col: dstCol } = dstPoint;
+
   for (const [bannedSrc, bannedDst] of bannedRules) {
-    if (src.col === bannedSrc && dst.col === bannedDst) {
+    if (srcCol === bannedSrc && dstCol === bannedDst) {
       return true;
     }
   }
