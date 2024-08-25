@@ -4,7 +4,7 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import DroppableWrapper from './DroppableWrapper';
 import ResultMessage from './ResultMessage';
 import { COLUMN_COUNT, INITIAL_ITEM_COUNT, INITIAL_SRC_DRAGGABLE, BANNED_COLUMN_MOVING_RULES } from './constant';
-import { itemListscreator, dstDraggableStateCreator } from './creator';
+import { itemListscreator, dstDraggableStateCreator, draggableCreator } from './creator';
 import { getLayoutStyles } from './styles';
 import { reorder, isDraggableIdxValid, isDroppableIdxValid, getNumberFromId, sortSrcDraggableByRow } from './utils';
 
@@ -72,18 +72,10 @@ export default function App() {
     // 다른 것으로
     if (!srcDraggable.has(srcId)) {
       const newSrcDraggable = new Map();
-      newSrcDraggable.set(srcId, {
-        row: source.index,
-        col: srcCol,
-        id: draggableId,
-      });
+      newSrcDraggable.set(srcId, draggableCreator(srcCol, source.index, draggableId));
       setSrcDraggable(newSrcDraggable);
     }
-    setPickedDraggable({
-      row: source.index,
-      col: srcCol,
-      id: draggableId,
-    });
+    setPickedDraggable(draggableCreator(srcCol, source.index, draggableId));
   };
 
   const handleDragUpdate = ({ destination, draggableId }) => {
@@ -96,11 +88,7 @@ export default function App() {
 
     const dstCol = getNumberFromId(destination.droppableId);
     // draggableCreator 적용
-    const dstDraggable = {
-      row: destination.index,
-      col: dstCol,
-      id: draggableId,
-    };
+    const dstDraggable = draggableCreator(dstCol, destination.index, draggableId);
     let invalidMsg = null;
 
     if (isDroppableIdxValid(pickedDraggable, dstDraggable, BANNED_COLUMN_MOVING_RULES)) {

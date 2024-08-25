@@ -1,3 +1,9 @@
+const getItems = (count) =>
+  Array.from({ length: count }, (v, k) => k).map((k) => ({
+    id: `item-${k}`,
+    content: `item ${k}`,
+  }));
+
 export const initialSrcDraggableCreator = (arr) => arr.map((v) => [v, { row: v, col: 0, id: `item-${v}` }]);
 
 export const dstDraggableStateCreator = (isValid, invalidMsg = '') => ({
@@ -5,11 +11,7 @@ export const dstDraggableStateCreator = (isValid, invalidMsg = '') => ({
   invalidMsg,
 });
 
-const getItems = (count) =>
-  Array.from({ length: count }, (v, k) => k).map((k) => ({
-    id: `item-${k}`,
-    content: `item ${k}`,
-  }));
+export const draggableCreator = (col, row, id) => ({ col: col, row: row, id: id });
 
 // columnCount: 칼럼 개수
 // initCount: 초기 아이템 개수

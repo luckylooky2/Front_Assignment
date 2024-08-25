@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 
+import { draggableCreator } from './creator';
 import { getDndStyles } from './styles';
 import { getNumberFromId, sortSrcDraggableByRow } from './utils';
 
@@ -48,19 +49,15 @@ const DraggableWrapper = ({
           // 아래 방향만 유효
           for (let i = sorted[0].row; i <= rowIdx; i++) {
             const item = itemList[i];
-            newSrcDraggable.set(getNumberFromId(item.id), {
-              row: i,
-              col,
-              id: item.id,
-            });
+            newSrcDraggable.set(getNumberFromId(item.id), draggableCreator(col, i, item.id));
           }
           // 첫 번째가 없다면? target만
         } else {
-          newSrcDraggable.set(id, { row, col, id: rbdDraggableId });
+          newSrcDraggable.set(id, draggableCreator(col, row, rbdDraggableId));
         }
         // 그냥 눌렀다면
       } else {
-        newSrcDraggable.set(id, { row, col, id: rbdDraggableId });
+        newSrcDraggable.set(id, draggableCreator(col, row, rbdDraggableId));
       }
     }
 
