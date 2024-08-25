@@ -62,10 +62,10 @@ export default function App() {
 
     const { droppableId: startId, index: startRow } = result.source;
     const { droppableId: endId, index: endRow } = result.destination;
-    const currId = getNumberFromId(result.draggableId);
+    const srcId = getNumberFromId(result.draggableId);
     const targets = sortSrcDraggableByRow([...srcDraggable]);
     const [startCol, endCol] = [getNumberFromId(startId), getNumberFromId(endId)];
-    const newItems = reorder(itemLists, targets, targets, [startCol, startRow, currId], [endCol, endRow]);
+    const newItems = reorder(itemLists, targets, [startCol, startRow, srcId], [endCol, endRow]);
 
     setItemLists(newItems);
     addResult(true);
@@ -112,7 +112,7 @@ export default function App() {
 
     if (isDroppableIdxValid(firstPicked, dstDraggable, BANNED_COLUMN_MOVING_RULES)) {
       invalidMsg = `칼럼 ${firstPicked.col + 1}에서 칼럼 ${dstDraggable.col + 1}로 옮길 수 없습니다`;
-    } else if (isDraggableIdxValid(firstPicked, dstDraggable, itemLists)) {
+    } else if (isDraggableIdxValid(itemLists, firstPicked, dstDraggable)) {
       invalidMsg = '짝수 아이템을 짝수 아이템 앞으로 옮길 수 없습니다';
     }
 
