@@ -1,6 +1,9 @@
-// srcDraggable: 이동 후 업데이트할 대상
-// dstCol: 드랍 지점 칼럼 인덱스
-// dstRow: 드랍 지점 로우 인덱스
+/**
+ * 이동한 아이템 배열의 row와 column을 최신으로 업데이트한다.
+ * @param {Array} srcDraggable 이동한 아이템 배열
+ * @param {Number} dstCol 드롭 지점 column 인덱스
+ * @param {Number} dstRow 드롭 지점 row 인덱스
+ */
 const updateRowCol = (srcDraggable, dstCol, dstRow) => {
   let offset = 0;
   for (const elem of srcDraggable) {
@@ -10,16 +13,24 @@ const updateRowCol = (srcDraggable, dstCol, dstRow) => {
   }
 };
 
-// candidates: 비교하고자 하는 대상 배열
-// referenceSet: 비교 기준 배열
-// srcId: 단, 제외할 대상
+/**
+ * 기준 배열에 존재하는 후보 배열의 요소만 필터링한다.
+ * @param {Array} candidates 비교하고자 하는 대상 배열
+ * @param {Array} referenceSet 비교가 되는 기준 배열
+ * @param {Number} srcId 비교에서 제외할 대상
+ * @returns {Array} 비교되어 필터링된 candidates
+ */
 const countMatchingElements = (candidates, referenceSet, srcId) => {
   return candidates.filter((item) => referenceSet.includes(item) && srcId !== item).length;
 };
 
-// lists: 하나의 아이템 배열
-// srcIndex: 드래그 시작 인덱스
-// dstIndex: 드랍 인덱스
+/**
+ * 드래그 후의 업데이트한 아이템 1차원 배열의 복사본을 반환한다.
+ * @param {Array} list 아이템 1차원 배열
+ * @param {Number} srcIndex 드래그 시작 row 인덱스
+ * @param {Number} dstIndex 드롭 row 인덱스
+ * @returns {Array} 순서가 변경된 아이템 1차원 배열
+ */
 const reorderWithinColumn = (list, srcIndex, dstIndex) => {
   const result = Array.from(list);
   const [removed] = result.splice(srcIndex, 1);
@@ -27,10 +38,14 @@ const reorderWithinColumn = (list, srcIndex, dstIndex) => {
   return result;
 };
 
-// itemLists: 전체 아이템 배열
-// arrayToMove: 선택 아이템(옮길 아이템) 배열
-// srcPoint: 드래그 시작 지점
-// dstPoint: 드랍 지점
+/**
+ * 드래그 후의 업데이트한 아이템 2차원 배열의 복사본을 반환한다.
+ * @param {Array} itemLists 아이템 2차원 배열
+ * @param {Array} arrayToMove 이동할 아이템 배열
+ * @param {Array} srcPoint 드래그 시작 지점(column, row)
+ * @param {Array} dstPoint 드롭 지점(column, row)
+ * @returns {Array} 순서가 변경된 아이템 2차원 배열
+ */
 export const reorder = (itemLists, arrayToMove, srcPoint, dstPoint) => {
   const { col: firstElemCol } = arrayToMove[0];
   const [srcCol, srcRow, srcId] = srcPoint;
@@ -83,15 +98,19 @@ export const reorder = (itemLists, arrayToMove, srcPoint, dstPoint) => {
   return newItemLists;
 };
 
-// itemLists: 전체 아이템 배열
-// srcPoint: 드래그 시작 지점
-// dstPoint: 드랍 지점
-export const isDraggableIdxValid = (itemLists, srcPoint, dstPoint) => {
-  if (srcPoint === null || dstPoint === null) {
+/**
+ * 드롭 지점의 row로 이동이 가능한지 여부를 판단한다.
+ * @param {Array} itemLists 아이템 2차원 배열
+ * @param {Object} srcLastPoint 드래그한 아이템 중 가장 마지막 아이템의 지점
+ * @param {Object} dstPoint 드롭 지점
+ * @returns {boolean} 드롭 지점의 row에 이동이 가능한지 여부
+ */
+export const isDraggableIdxValid = (itemLists, srcLastPoint, dstPoint) => {
+  if (srcLastPoint === null || dstPoint === null) {
     return false;
   }
 
-  const { row: srcRow, col: srcCol } = srcPoint;
+  const { row: srcRow, col: srcCol } = srcLastPoint;
   const { row: dstRow, col: dstCol } = dstPoint;
 
   if (srcRow === dstRow && srcCol === dstCol) {
@@ -116,9 +135,13 @@ export const isDraggableIdxValid = (itemLists, srcPoint, dstPoint) => {
   return false;
 };
 
-// srcPoint: 드래그 시작 지점
-// dstPoint: 드랍 지점
-// bannedRules: 칼럼 간 이동 금지 규칙 배열
+/**
+ * 드롭 지점의 column으로 이동이 가능한지 여부를 판단한다.
+ * @param {Object} srcPoint 드래그 시작 지점
+ * @param {Object} dstPoint 드롭 지점
+ * @param {Array} bannedRules column 간 이동 금지 규칙 배열
+ * @returns {boolean} 드롭 지점의 column으로 이동이 가능한지 여부
+ */
 export const isDroppableIdxValid = (srcPoint, dstPoint, bannedRules) => {
   if (srcPoint === null || dstPoint === null) {
     return false;
@@ -135,10 +158,20 @@ export const isDroppableIdxValid = (srcPoint, dstPoint, bannedRules) => {
   return false;
 };
 
-export const getNumberFromId = (string) => {
-  return Number(string.split('-')[1]);
+/**
+ * 아이템의 Id의 가장 끝 숫자를 파싱한다.
+ * @param {String} itemId 아이템의 Id
+ * @returns {Number} Id의 가장 끝 숫자
+ */
+export const getNumberFromId = (itemId) => {
+  return Number(itemId.split('-')[1]);
 };
 
+/**
+ * 드래그한 아이템 배열을 row 기준 오름차순으로 정렬한다.
+ * @param {Array} arr 드래그한 아이템 배열
+ * @returns {Array} row 기준 오름차순으로 정렬된 아이템 배열
+ */
 export const sortSrcDraggableByRow = (arr) => {
   return arr.map(([_id, src]) => src).sort((a, b) => a.row - b.row);
 };
