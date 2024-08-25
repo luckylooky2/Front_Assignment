@@ -17,10 +17,13 @@ const countMatchingElements = (candidates, referenceSet, srcId) => {
   return candidates.filter((item) => referenceSet.includes(item) && srcId !== item).length;
 };
 
-const reorderWithinColumn = (list, startIndex, endIndex) => {
+// lists: 하나의 아이템 배열
+// srcIndex: 드래그 시작 인덱스
+// dstIndex: 드랍 인덱스
+const reorderWithinColumn = (list, srcIndex, dstIndex) => {
   const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
+  const [removed] = result.splice(srcIndex, 1);
+  result.splice(dstIndex, 0, removed);
   return result;
 };
 
