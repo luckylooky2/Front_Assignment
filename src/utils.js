@@ -140,7 +140,7 @@ export const isDraggableIdxValid = (itemLists, srcLastPoint, dstPoint) => {
  * @param {Object} srcPoint 드래그 시작 지점
  * @param {Object} dstPoint 드롭 지점
  * @param {Array} bannedRules column 간 이동 금지 규칙 배열
- * @returns {boolean} 드롭 지점의 column으로 이동이 가능한지 여부
+ * @returns {Boolean} 드롭 지점의 column으로 이동이 가능한지 여부
  */
 export const isDroppableIdxValid = (srcPoint, dstPoint, bannedRules) => {
   if (srcPoint === null || dstPoint === null) {

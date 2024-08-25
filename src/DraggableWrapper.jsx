@@ -20,6 +20,10 @@ const DraggableWrapper = ({
   const styles = getDndStyles;
   const { isValid, invalidMsg } = dstDraggableState;
 
+  /**
+   * 아이템 선택 클릭 이벤트 콜백 함수. Ctrl, Shift 키에 따라 선택된 아이템을 추가 또는 삭제한다.
+   * @param {Object} event 클릭 이벤트 객체
+   */
   const handleClick = (event) => {
     event.stopPropagation();
     const { target, metaKey, ctrlKey, shiftKey } = event;

@@ -17,10 +17,18 @@ export default function App() {
   const layoutStyles = getLayoutStyles;
   const infoStyles = getInformationStyles;
 
+  /**
+   * 표시 시간이 지난 이동 결과를 배열에서 제거한다.
+   * @param {Number} id 이동 결과의 id
+   */
   const removeResult = (id) => {
     setDragResults((prevAlerts) => prevAlerts.filter((alert) => alert.id !== id));
   };
 
+  /**
+   * 이동 결과를 배열에 추가하고, 표시 시간이 지나면 삭제하는 콜백 함수를 등록한다.
+   * @param {Boolean} result 이동 결과 성공/실패 여부
+   */
   const addResult = (result) => {
     const id = Date.now();
     setDragResults((prev) => [...prev, { id, result, visible: true }]);
@@ -36,6 +44,10 @@ export default function App() {
     }, 3500);
   };
 
+  /**
+   * 드롭 이벤트가 발생하면 호출되는 콜백 함수. 조건에 따라 드래그한 아이템을 업데이트할지 여부를 결정한다.
+   * @param {Object} result 드롭 이벤트 객체
+   */
   const handleDragEnd = (result) => {
     setPickedDraggable(null);
     // 아무런 변화도 없는 경우
@@ -66,6 +78,10 @@ export default function App() {
     setDstDraggableState(dstDraggableStateCreator(true));
   };
 
+  /**
+   *  드래그 시작 이벤트가 발생하면 호출되는 콜백 함수. 직접 드래그되는 아이템(pickedDraggable)을 업데이트한다.
+   * @param {Object} result 드래그 시작 이벤트 객체
+   */
   const handleDragStart = ({ source, draggableId }) => {
     const srcCol = getNumberFromId(source.droppableId);
     const srcId = getNumberFromId(draggableId);
@@ -79,6 +95,10 @@ export default function App() {
     setPickedDraggable(draggableCreator(srcCol, source.index, draggableId));
   };
 
+  /**
+   * 드래그 업데이트 이벤트가 발생하면 호출되는 콜백 함수. 드롭이 가능하지 않은 경우, 메시지를 렌더링한다.
+   * @param {Object} result 드래그 업데이트 이벤트 객체
+   */
   const handleDragUpdate = ({ destination, draggableId }) => {
     setDstDraggableState(dstDraggableStateCreator(true));
 
@@ -104,6 +124,9 @@ export default function App() {
     }
   };
 
+  /**
+   * 현재 선택된 아이템을 초기화하는 클릭 이벤트 콜백 함수.
+   */
   const handleResetSrcDraggable = () => {
     if (pickedDraggable === null) {
       setSrcDraggable(new Map());
