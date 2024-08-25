@@ -3,11 +3,7 @@ import { DragDropContext } from 'react-beautiful-dnd';
 
 import DroppableWrapper from './DroppableWrapper';
 import ResultMessage from './ResultMessage';
-import {
-  COLUMN_COUNT,
-  INITIAL_ITEM_COUNT,
-  BANNED_COLUMN_MOVING_RULES,
-} from './constant';
+import { COLUMN_COUNT, INITIAL_ITEM_COUNT, INITIAL_SRC_DRAGGABLE, BANNED_COLUMN_MOVING_RULES } from './constant';
 import { getLayoutStyles } from './styles';
 import {
   createItemLists,
@@ -20,21 +16,15 @@ import {
 } from './utils';
 
 export default function App() {
-  const [itemLists, setItemLists] = useState(
-    createItemLists(COLUMN_COUNT, INITIAL_ITEM_COUNT),
-  );
-  const [srcDraggable, setSrcDraggable] = useState(new Map());
+  const [itemLists, setItemLists] = useState(createItemLists(COLUMN_COUNT, INITIAL_ITEM_COUNT));
+  const [srcDraggable, setSrcDraggable] = useState(new Map(INITIAL_SRC_DRAGGABLE));
   const [firstPicked, setFirstPicked] = useState(null);
-  const [dstDraggableState, setDstDraggableState] = useState(
-    dstDraggableStateCreator(true),
-  );
+  const [dstDraggableState, setDstDraggableState] = useState(dstDraggableStateCreator(true));
   const [dragResults, setDragResults] = useState([]);
   const styles = getLayoutStyles;
 
   const removeResult = (id) => {
-    setDragResults((prevAlerts) =>
-      prevAlerts.filter((alert) => alert.id !== id),
-    );
+    setDragResults((prevAlerts) => prevAlerts.filter((alert) => alert.id !== id));
   };
 
   const addResult = (result) => {
@@ -43,9 +33,7 @@ export default function App() {
 
     setTimeout(() => {
       setDragResults((prevAlerts) =>
-        prevAlerts.map((alert) =>
-          alert.id === id ? { ...alert, visible: false } : alert,
-        ),
+        prevAlerts.map((alert) => (alert.id === id ? { ...alert, visible: false } : alert)),
       );
     }, 3000);
 
@@ -59,8 +47,7 @@ export default function App() {
     // 아무런 변화도 없는 경우
     if (
       !result.destination ||
-      (result.source.droppableId === result.destination.droppableId &&
-        result.source.index === result.destination.index)
+      (result.source.droppableId === result.destination.droppableId && result.source.index === result.destination.index)
     ) {
       setDstDraggableState(dstDraggableStateCreator(true));
       return;
@@ -75,17 +62,10 @@ export default function App() {
 
     const { droppableId: startId, index: startRow } = result.source;
     const { droppableId: endId, index: endRow } = result.destination;
+    const currId = getNumberFromId(result.draggableId);
     const targets = sortSrcDraggableByRow([...srcDraggable]);
-    const [startCol, endCol] = [
-      getNumberFromId(startId),
-      getNumberFromId(endId),
-    ];
-    const newItems = reorder(
-      itemLists,
-      targets,
-      [startCol, startRow],
-      [endCol, endRow],
-    );
+    const [startCol, endCol] = [getNumberFromId(startId), getNumberFromId(endId)];
+    const newItems = reorder(itemLists, targets, targets, [startCol, startRow, currId], [endCol, endRow]);
 
     setItemLists(newItems);
     addResult(true);
@@ -130,9 +110,7 @@ export default function App() {
     };
     let invalidMsg = null;
 
-    if (
-      isDroppableIdxValid(firstPicked, dstDraggable, BANNED_COLUMN_MOVING_RULES)
-    ) {
+    if (isDroppableIdxValid(firstPicked, dstDraggable, BANNED_COLUMN_MOVING_RULES)) {
       invalidMsg = `칼럼 ${firstPicked.col + 1}에서 칼럼 ${dstDraggable.col + 1}로 옮길 수 없습니다`;
     } else if (isDraggableIdxValid(firstPicked, dstDraggable, itemLists)) {
       invalidMsg = '짝수 아이템을 짝수 아이템 앞으로 옮길 수 없습니다';
@@ -150,15 +128,8 @@ export default function App() {
   };
 
   return (
-    <DragDropContext
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      onDragUpdate={handleDragUpdate}
-    >
-      <section
-        className={styles.appContainer}
-        onClick={handleResetSrcDraggable}
-      >
+    <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragUpdate={handleDragUpdate}>
+      <section className={styles.appContainer} onClick={handleResetSrcDraggable}>
         <div className={styles.droppableContainer}>
           {itemLists.map((itemList, index) => (
             <DroppableWrapper
@@ -177,7 +148,3 @@ export default function App() {
     </DragDropContext>
   );
 }
-
-// 3, 5, 7 선택(3, 4, 5 도 이상함)
-// 1) 2 위로 : OK
-// 2) 2 아래로 : NO

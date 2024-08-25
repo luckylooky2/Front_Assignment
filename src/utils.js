@@ -5,9 +5,7 @@ const getItems = (count) =>
   }));
 
 export const createItemLists = (columnCount, initCount) => {
-  const itemCountsPerColumn = [initCount].concat(
-    Array.from({ length: columnCount - 1 }).fill(0),
-  );
+  const itemCountsPerColumn = [initCount].concat(Array.from({ length: columnCount - 1 }).fill(0));
 
   return itemCountsPerColumn.map((count) => getItems(count));
 };
@@ -21,20 +19,40 @@ const updateRowCol = (srcDraggable, endCol, endRow) => {
   }
 };
 
-export const reorder = (lists, arrayToMove, startPoint, endPoint) => {
-  const [startCol, startRow] = startPoint;
+const countElementsBetween2 = (targetArr, arr, currId) => {
+  let index = 0;
+
+  for (const num of targetArr) {
+    if (arr.includes(num) && currId !== num) {
+      index++;
+    }
+  }
+
+  return index;
+};
+
+const reorderWithinColumn = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+  return result;
+};
+
+export const reorder = (lists, arrayToMove, srcs, startPoint, endPoint) => {
+  const { col: firstCol, row: firstRow } = srcs[0];
+  const [startCol, startRow, currId] = startPoint;
   const [endCol, endRow] = endPoint;
   const newLists = [...lists];
-  const isSelected = lists[startCol].map(() => false);
+  const isSelected = lists[firstCol].map(() => false);
   const [removed, from] = [[], []];
 
   for (const elem of arrayToMove) {
     isSelected[elem.row] = true;
   }
 
-  const oldFrom = lists[startCol];
+  const oldFrom = lists[firstCol];
+
   for (let i = 0; i < oldFrom.length; i++) {
-    console.log(oldFrom[i]);
     if (isSelected[i]) {
       removed.push(oldFrom[i]);
     } else {
@@ -42,12 +60,26 @@ export const reorder = (lists, arrayToMove, startPoint, endPoint) => {
     }
   }
 
-  if (startCol === endCol) {
-    // 위 방향으로 이동할 때 고려
-    const offset = endRow > startRow ? removed.length - 1 : 0;
+  if (firstCol === endCol) {
+    let count = 0;
+    // 아래 방향
+    if (endRow >= srcs[srcs.length - 1].row) {
+      count = arrayToMove.length - 1;
+      // 위 방향
+    } else if (endRow <= srcs[0].row) {
+      count = 0;
+    } else {
+      const list = reorderWithinColumn(lists[startCol], currId, endRow);
 
-    from.splice(endRow - offset, 0, ...removed);
-    updateRowCol(arrayToMove, endCol, endRow - offset);
+      count = countElementsBetween2(
+        list.slice(0, endRow + 1).map(({ id }) => getNumberFromId(id)),
+        arrayToMove.map(({ id }) => getNumberFromId(id)),
+        currId,
+      );
+    }
+
+    from.splice(endRow - count, 0, ...removed);
+    updateRowCol(arrayToMove, endCol, endRow - count);
   } else {
     const to = [...lists[endCol]];
 
@@ -55,7 +87,7 @@ export const reorder = (lists, arrayToMove, startPoint, endPoint) => {
     updateRowCol(arrayToMove, endCol, endRow);
     newLists[endCol] = to;
   }
-  newLists[startCol] = from;
+  newLists[firstCol] = from;
 
   return newLists;
 };
@@ -112,3 +144,5 @@ export const getNumberFromId = (string) => {
 export const sortSrcDraggableByRow = (arr) => {
   return arr.map(([_id, src]) => src).sort((a, b) => a.row - b.row);
 };
+
+export const initialSrcDraggableGenerator = (arr) => arr.map((v) => [v, { row: v, col: 0, id: `item-${v}` }]);
