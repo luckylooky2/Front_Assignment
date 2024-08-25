@@ -60,12 +60,12 @@ export default function App() {
       return;
     }
 
-    const { droppableId: startId, index: startRow } = result.source;
-    const { droppableId: endId, index: endRow } = result.destination;
+    const { droppableId: tmpSrcRow, index: srcRow } = result.source;
+    const { droppableId: tmpDstRow, index: dstRow } = result.destination;
     const srcId = getNumberFromId(result.draggableId);
-    const targets = sortSrcDraggableByRow([...srcDraggable]);
-    const [startCol, endCol] = [getNumberFromId(startId), getNumberFromId(endId)];
-    const newItems = reorder(itemLists, targets, [startCol, startRow, srcId], [endCol, endRow]);
+    const arrayToMove = sortSrcDraggableByRow([...srcDraggable]);
+    const [srcCol, dstCol] = [getNumberFromId(tmpSrcRow), getNumberFromId(tmpDstRow)];
+    const newItems = reorder(itemLists, arrayToMove, [srcCol, srcRow, srcId], [dstCol, dstRow]);
 
     setItemLists(newItems);
     addResult(true);
@@ -73,22 +73,22 @@ export default function App() {
   };
 
   const handleDragStart = ({ source, draggableId }) => {
-    const droppableIdx = getNumberFromId(source.droppableId);
-    const id = getNumberFromId(draggableId);
+    const srcCol = getNumberFromId(source.droppableId);
+    const srcId = getNumberFromId(draggableId);
 
     // 다른 것으로
-    if (!srcDraggable.has(id)) {
+    if (!srcDraggable.has(srcId)) {
       const newSrcDraggable = new Map();
-      newSrcDraggable.set(id, {
+      newSrcDraggable.set(srcId, {
         row: source.index,
-        col: droppableIdx,
+        col: srcCol,
         id: draggableId,
       });
       setSrcDraggable(newSrcDraggable);
     }
     setFirstPicked({
       row: source.index,
-      col: droppableIdx,
+      col: srcCol,
       id: draggableId,
     });
   };
@@ -101,11 +101,11 @@ export default function App() {
       return;
     }
 
-    const droppableIdx = getNumberFromId(destination.droppableId);
+    const dstCol = getNumberFromId(destination.droppableId);
     // draggableCreator 적용
     const dstDraggable = {
       row: destination.index,
-      col: droppableIdx,
+      col: dstCol,
       id: draggableId,
     };
     let invalidMsg = null;
