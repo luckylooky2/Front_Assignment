@@ -70,7 +70,7 @@ export default function App() {
     const srcCol = getNumberFromId(source.droppableId);
     const srcId = getNumberFromId(draggableId);
 
-    // 다른 것으로
+    // 현재 선택된 것과 다른 것을 드래그 한 경우
     if (!srcDraggable.has(srcId)) {
       const newSrcDraggable = new Map();
       newSrcDraggable.set(srcId, draggableCreator(srcCol, source.index, draggableId));
