@@ -5,7 +5,7 @@ import { Draggable } from 'react-beautiful-dnd';
 
 import { draggableCreator } from './creator';
 import { getDndStyles } from './styles';
-import { getNumberFromId, sortSrcDraggableByRow } from './utils';
+import { getNumberFromId, sortSrcDraggableByRow, upperBound, predecessor } from './utils';
 
 const DraggableWrapper = ({
   item,
@@ -16,6 +16,8 @@ const DraggableWrapper = ({
   setSrcDraggable,
   dstDraggableState,
   pickedDraggable,
+  lastClicked,
+  setLastClicked,
 }) => {
   const styles = getDndStyles;
   const { isValid, invalidMsg } = dstDraggableState;
@@ -37,31 +39,54 @@ const DraggableWrapper = ({
       const oldSrcDraggable = [...srcDraggable];
       isSameCol = col === oldSrcDraggable[0][1].col;
     }
+
     const newSrcDraggable = isSameCol && (metaKey || ctrlKey) ? new Map(srcDraggable) : new Map();
 
     // 같은 칼럼에서 ctrl을 누른 채로, 이미 클릭되어 있다면
     if (srcDraggable.has(id) && isSameCol && (metaKey || ctrlKey)) {
       newSrcDraggable.delete(id);
+      if (newSrcDraggable) {
+        // 바로 아래가 선택됨
+        const justBelowRow = upperBound(newSrcDraggable, id);
+        if (justBelowRow === null) {
+          // 아래 없으면 위에가 선택됨
+          const justAboveRow = predecessor(newSrcDraggable, id);
+          if (justAboveRow === null) {
+            setLastClicked([null, null]);
+          } else {
+            setLastClicked([justAboveRow, col]);
+          }
+        } else {
+          setLastClicked([justBelowRow, col]);
+        }
+      }
       // 클릭되어 있지 않다면(shift를 눌렀거나 그냥 눌렀거나)
     } else {
       // shift를 누른 채라면
       if (shiftKey) {
         const sorted = srcDraggable.size && isSameCol ? sortSrcDraggableByRow([...srcDraggable]) : null;
-
         // 첫 번째가 있다면? 첫 번째부터 target까지
-        if (srcDraggable.size && sorted && rowIdx > sorted[0].row) {
-          // 아래 방향만 유효
-          for (let i = sorted[0].row; i <= rowIdx; i++) {
+        // 아래 방향
+        if (srcDraggable.size && sorted && row > lastClicked[0]) {
+          for (let i = lastClicked[0]; i <= row; i++) {
+            const item = itemList[i];
+            newSrcDraggable.set(getNumberFromId(item.id), draggableCreator(col, i, item.id));
+          }
+          // 위 방향
+        } else if (srcDraggable.size && sorted && row < lastClicked[0]) {
+          for (let i = row; i <= lastClicked[0]; i++) {
             const item = itemList[i];
             newSrcDraggable.set(getNumberFromId(item.id), draggableCreator(col, i, item.id));
           }
           // 첫 번째가 없다면? target만
         } else {
           newSrcDraggable.set(id, draggableCreator(col, row, rbdDraggableId));
+          setLastClicked([row, col]);
         }
         // 그냥 눌렀다면
       } else {
         newSrcDraggable.set(id, draggableCreator(col, row, rbdDraggableId));
+        setLastClicked([row, col]);
       }
     }
 
@@ -113,4 +138,6 @@ DraggableWrapper.propTypes = {
   setSrcDraggable: PropTypes.func,
   dstDraggableState: PropTypes.object,
   pickedDraggable: PropTypes.object,
+  lastClicked: PropTypes.array,
+  setLastClicked: PropTypes.func,
 };
