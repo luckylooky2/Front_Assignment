@@ -175,3 +175,54 @@ export const getNumberFromId = (itemId) => {
 export const sortSrcDraggableByRow = (arr) => {
   return arr.map(([_id, src]) => src).sort((a, b) => a.row - b.row);
 };
+
+/**
+ * map에서 targetKey보다 큰 첫 번째 키를 반환한다.
+ * @param {Map} map 대상 Map 객체
+ * @param {Number} targetKey 기준이 되는 키의 값
+ * @returns {Number | null} targetKey보다 큰 첫 번째 키. 없다면 null
+ */
+export const upperBound = (map, targetKey) => {
+  const keys = Array.from(map.keys()).sort((a, b) => a - b);
+  for (let k of keys) {
+    if (k >= targetKey) {
+      return map.get(k).row;
+    }
+  }
+  return null;
+};
+
+/**
+ * map에서 targetKey보다 크거나 같은 첫 번째 키를 반환한다.
+ * @param {Map} map 대상 Map 객체
+ * @param {Number} targetKey 기준이 되는 키의 값
+ * @returns {Number | null} targetKey보다 크거나 같은 첫 번째 키. 없다면 null
+ */
+export const lowerBound = (map, key) => {
+  const keys = Array.from(map.keys()).sort((a, b) => a - b);
+  for (let k of keys) {
+    if (k > key) {
+      return map.get(k).row;
+    }
+  }
+  return null;
+};
+
+/**
+ * map에서 targetKey보다 작은 키 중 가장 큰 키를 반환한다.
+ * @param {Map} map 대상 Map 객체
+ * @param {Number} targetKey 기준이 되는 키의 값
+ * @returns {Number | null} targetKey보다 작은 키 중에서 가장 큰 키. 없다면 null
+ */
+export const predecessor = (map, key) => {
+  const keys = Array.from(map.keys()).sort((a, b) => a - b);
+  let result = null;
+  for (let k of keys) {
+    if (k < key) {
+      result = map.get(k).row;
+    } else {
+      break;
+    }
+  }
+  return result;
+};
