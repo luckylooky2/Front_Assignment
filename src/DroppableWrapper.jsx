@@ -12,6 +12,8 @@ const DroppableWrapper = ({
   setSrcDraggable,
   dstDraggableState,
   pickedDraggable,
+  lastClicked,
+  setLastClicked,
 }) => {
   const styles = getDndStyles;
 
@@ -30,6 +32,8 @@ const DroppableWrapper = ({
               setSrcDraggable={setSrcDraggable}
               dstDraggableState={dstDraggableState}
               pickedDraggable={pickedDraggable}
+              lastClicked={lastClicked}
+              setLastClicked={setLastClicked}
             />
           ))}
           {provided.placeholder}
@@ -48,4 +52,6 @@ DroppableWrapper.propTypes = {
   setSrcDraggable: PropTypes.func,
   dstDraggableState: PropTypes.object,
   pickedDraggable: PropTypes.object,
+  lastClicked: PropTypes.array,
+  setLastClicked: PropTypes.func,
 };

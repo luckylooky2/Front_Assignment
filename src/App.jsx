@@ -14,6 +14,7 @@ export default function App() {
   const [pickedDraggable, setPickedDraggable] = useState(null);
   const [dstDraggableState, setDstDraggableState] = useState(dstDraggableStateCreator(true));
   const [dragResults, setDragResults] = useState([]);
+  const [lastClicked, setLastClicked] = useState([null, null]);
   const layoutStyles = getLayoutStyles;
   const infoStyles = getInformationStyles;
 
@@ -157,6 +158,8 @@ export default function App() {
               setSrcDraggable={setSrcDraggable}
               dstDraggableState={dstDraggableState}
               pickedDraggable={pickedDraggable}
+              lastClicked={lastClicked}
+              setLastClicked={setLastClicked}
             />
           ))}
         </div>
