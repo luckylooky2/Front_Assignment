@@ -137,7 +137,10 @@ export default function App() {
     <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragUpdate={handleDragUpdate}>
       <aside>
         <div className={infoStyles.info}>
-          <b>ℹ️ 여러 항목을 선택하려면, Ctrl 키를 누른 상태에서 항목을 클릭하세요.</b>
+          <b>
+            ℹ️ 여러 항목을 선택하려면, Windows에서는 Ctrl 키를, Mac에서는 Command(⌘) 키를 누른 상태에서 항목을
+            클릭하세요.
+          </b>
         </div>
         <div className={infoStyles.info}>
           <b>ℹ️ 연속된 항목을 선택하려면, Shift 키를 누른 상태에서 첫 번째와 마지막 항목을 클릭하세요.</b>
