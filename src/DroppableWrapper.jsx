@@ -6,6 +6,7 @@ import DraggableWrapper from './DraggableWrapper';
 import { getDndStyles } from './styles';
 
 const DroppableWrapper = ({
+  itemLists,
   itemList,
   droppableIdx,
   srcDraggable,
@@ -25,6 +26,7 @@ const DroppableWrapper = ({
             <DraggableWrapper
               key={`draggable-${index}`}
               item={item}
+              itemLists={itemLists}
               itemList={itemList}
               droppableIdx={droppableIdx}
               itemIndex={index}
@@ -46,6 +48,7 @@ const DroppableWrapper = ({
 export default DroppableWrapper;
 
 DroppableWrapper.propTypes = {
+  itemLists: PropTypes.array,
   itemList: PropTypes.array,
   droppableIdx: PropTypes.number,
   srcDraggable: PropTypes.object,
