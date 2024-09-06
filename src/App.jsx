@@ -14,7 +14,7 @@ export default function App() {
   const [pickedDraggable, setPickedDraggable] = useState(null);
   const [dstDraggableState, setDstDraggableState] = useState(dstDraggableStateCreator(true));
   const [dragResults, setDragResults] = useState([]);
-  const [lastClicked, setLastClicked] = useState([null, null]);
+  const [lastClicked, setLastClicked] = useState([null, null, null]);
   const layoutStyles = getLayoutStyles;
   const infoStyles = getInformationStyles;
 
@@ -43,6 +43,17 @@ export default function App() {
     setTimeout(() => {
       removeResult(id);
     }, 3500);
+  };
+
+  const updateLastClick = (newItems) => {
+    for (let i = 0; i < newItems.length; i++) {
+      for (let j = 0; j < newItems[i].length; j++) {
+        if (newItems[i][j].id === lastClicked[2]) {
+          setLastClicked([j, i, lastClicked[2]]);
+          break;
+        }
+      }
+    }
   };
 
   /**
@@ -74,6 +85,7 @@ export default function App() {
     const [srcCol, dstCol] = [getNumberFromId(tmpSrcRow), getNumberFromId(tmpDstRow)];
     const newItems = reorder(itemLists, arrayToMove, [srcCol, srcRow, srcId], [dstCol, dstRow]);
 
+    updateLastClick(newItems);
     setItemLists(newItems);
     addResult(true);
     setDstDraggableState(dstDraggableStateCreator(true));
@@ -131,6 +143,7 @@ export default function App() {
   const handleResetSrcDraggable = () => {
     if (pickedDraggable === null) {
       setSrcDraggable(new Map());
+      setLastClicked([null, null, null]);
     }
   };
 
@@ -152,6 +165,7 @@ export default function App() {
           {itemLists.map((itemList, index) => (
             <DroppableWrapper
               key={`droppable-${index}`}
+              itemLists={itemLists}
               itemList={itemList}
               droppableIdx={index}
               srcDraggable={srcDraggable}
