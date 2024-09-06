@@ -10,6 +10,7 @@ import { getNumberFromId, sortSrcDraggableByRow, upperBound, predecessor } from 
 const DraggableWrapper = ({
   item,
   itemList,
+  itemLists,
   itemIndex,
   droppableIdx,
   srcDraggable,
@@ -45,19 +46,20 @@ const DraggableWrapper = ({
     // 같은 칼럼에서 ctrl을 누른 채로, 이미 클릭되어 있다면
     if (srcDraggable.has(id) && isSameCol && (metaKey || ctrlKey)) {
       newSrcDraggable.delete(id);
+
       if (newSrcDraggable) {
         // 바로 아래가 선택됨
-        const justBelowRow = upperBound(newSrcDraggable, id);
+        const justBelowRow = upperBound(newSrcDraggable, row);
         if (justBelowRow === null) {
           // 아래 없으면 위에가 선택됨
-          const justAboveRow = predecessor(newSrcDraggable, id);
+          const justAboveRow = predecessor(newSrcDraggable, row);
           if (justAboveRow === null) {
-            setLastClicked([null, null]);
+            setLastClicked([null, null, null]);
           } else {
-            setLastClicked([justAboveRow, col]);
+            setLastClicked([justAboveRow, col, itemLists[col][justAboveRow].id]);
           }
         } else {
-          setLastClicked([justBelowRow, col]);
+          setLastClicked([justBelowRow, col, itemLists[col][justBelowRow].id]);
         }
       }
       // 클릭되어 있지 않다면(shift를 눌렀거나 그냥 눌렀거나)
@@ -74,6 +76,7 @@ const DraggableWrapper = ({
           }
           // 위 방향
         } else if (srcDraggable.size && sorted && row < lastClicked[0]) {
+          console.log(row, lastClicked);
           for (let i = row; i <= lastClicked[0]; i++) {
             const item = itemList[i];
             newSrcDraggable.set(getNumberFromId(item.id), draggableCreator(col, i, item.id));
@@ -81,12 +84,12 @@ const DraggableWrapper = ({
           // 첫 번째가 없다면? target만
         } else {
           newSrcDraggable.set(id, draggableCreator(col, row, rbdDraggableId));
-          setLastClicked([row, col]);
+          setLastClicked([row, col, rbdDraggableId]);
         }
         // 그냥 눌렀다면
       } else {
         newSrcDraggable.set(id, draggableCreator(col, row, rbdDraggableId));
-        setLastClicked([row, col]);
+        setLastClicked([row, col, rbdDraggableId]);
       }
     }
 
@@ -131,6 +134,7 @@ export default DraggableWrapper;
 
 DraggableWrapper.propTypes = {
   item: PropTypes.object,
+  itemLists: PropTypes.array,
   itemList: PropTypes.array,
   itemIndex: PropTypes.number,
   droppableIdx: PropTypes.number,

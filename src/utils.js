@@ -183,10 +183,10 @@ export const sortSrcDraggableByRow = (arr) => {
  * @returns {Number | null} targetKey보다 큰 첫 번째 키. 없다면 null
  */
 export const upperBound = (map, targetKey) => {
-  const keys = Array.from(map.keys()).sort((a, b) => a - b);
-  for (let k of keys) {
-    if (k >= targetKey) {
-      return map.get(k).row;
+  const entries = Array.from(map.entries()).sort((a, b) => a[1].row - b[1].row);
+  for (let [key, { row }] of entries) {
+    if (row >= targetKey) {
+      return map.get(key).row;
     }
   }
   return null;
@@ -198,11 +198,11 @@ export const upperBound = (map, targetKey) => {
  * @param {Number} targetKey 기준이 되는 키의 값
  * @returns {Number | null} targetKey보다 크거나 같은 첫 번째 키. 없다면 null
  */
-export const lowerBound = (map, key) => {
-  const keys = Array.from(map.keys()).sort((a, b) => a - b);
-  for (let k of keys) {
-    if (k > key) {
-      return map.get(k).row;
+export const lowerBound = (map, targetKey) => {
+  const entries = Array.from(map.entries()).sort((a, b) => a[1].row - b[1].row);
+  for (let [key, { row }] of entries) {
+    if (row > targetKey) {
+      return map.get(key).row;
     }
   }
   return null;
@@ -214,12 +214,12 @@ export const lowerBound = (map, key) => {
  * @param {Number} targetKey 기준이 되는 키의 값
  * @returns {Number | null} targetKey보다 작은 키 중에서 가장 큰 키. 없다면 null
  */
-export const predecessor = (map, key) => {
-  const keys = Array.from(map.keys()).sort((a, b) => a - b);
+export const predecessor = (map, targetKey) => {
+  const entries = Array.from(map.entries()).sort((a, b) => a[1].row - b[1].row);
   let result = null;
-  for (let k of keys) {
-    if (k < key) {
-      result = map.get(k).row;
+  for (let [key, { row }] of entries) {
+    if (row < targetKey) {
+      result = map.get(key).row;
     } else {
       break;
     }
